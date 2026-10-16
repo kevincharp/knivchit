@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="knivchit">
+  <schema id="org.gnome.shell.extensions.knivchit" path="/org/gnome/shell/extensions/knivchit/">
+    <key name="knivchit-start-capture" type="as">
+      <default>[]</default>
+      <summary>Atajo para iniciar una captura de pantalla</summary>
+      <description>Vacío por defecto: Knivchit no fija ningún atajo, lo elige el usuario en la Configuración de la app (que lo cambia por D-Bus, sin cerrar sesión). Al pulsarlo la extensión llama a org.knivchit.App.StartCapture.</description>
+    </key>
+    <key name="knivchit-open-emoji" type="as">
+      <default>[]</default>
+      <summary>Atajo del panel de emojis (reservado)</summary>
+      <description>Reservado para una función futura; vacío por defecto y todavía sin ligar a ninguna acción.</description>
+    </key>
+    <key name="knivchit-open-clipboard" type="as">
+      <default>[]</default>
+      <summary>Atajo del panel del portapapeles (reservado)</summary>
+      <description>Reservado para una función futura; vacío por defecto y todavía sin ligar a ninguna acción.</description>
+    </key>
+    <key name="show-panel-icon" type="b">
+      <default>true</default>
+      <summary>Mostrar el icono de Knivchit en la barra superior</summary>
+      <description>Con el valor activado la extensión muestra un icono en la barra superior de GNOME; un clic abre la ventana principal de Knivchit. Se cambia desde Ajustes de la aplicación (aplica en vivo, sin cerrar sesión).</description>
+    </key>
+  </schema>
+</schemalist>

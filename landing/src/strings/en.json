@@ -1,0 +1,372 @@
+{
+  "_note": "All visible text of the site (English, the published language). Inserted as-is (trusted HTML): only <kbd>, <code>, <strong>, <em> and <a>. The Spanish version is archived in strings/archive/es.json (its keys predate this structure; port it before using it).",
+  "meta": {
+    "lang": "en",
+    "title": "Knivchit: screenshots with annotations for GNOME on Wayland",
+    "description": "Early preview of Knivchit, a screenshot tool for GNOME on Wayland. Rounded selection, arrows, text and a mosaic brush; copy, save or pin the result. Local only, no accounts, no telemetry.",
+    "ogTitle": "Knivchit: screenshots with annotations for GNOME",
+    "ogDescription": "Select, annotate and pin your screen on GNOME with Wayland. Local only, no accounts, no telemetry.",
+    "ogImageAlt": "Knivchit logo: a knife with a blue blade and a wooden handle, next to the word knivchit, on a dark navy background",
+    "locale": "en_US",
+    "themeColorDark": "#0a0e1a",
+    "themeColorLight": "#f4f6fb"
+  },
+  "ui": {
+    "skip": "Skip to content",
+    "brand": "Knivchit",
+    "homeAria": "Knivchit, home",
+    "navAria": "Main",
+    "footerAria": "Footer",
+    "theme": {
+      "label": "Theme",
+      "dark": "Dark",
+      "light": "Light"
+    },
+    "soon": "Coming soon",
+    "diagramLabel": "Diagram"
+  },
+  "nav": [
+    { "href": "#how-it-works", "label": "How it works" },
+    { "href": "#tools", "label": "Tools" },
+    { "href": "#privacy", "label": "Privacy" },
+    { "href": "#soon", "label": "Coming soon" },
+    { "href": "#install", "label": "Install" },
+    { "href": "#faq", "label": "FAQ" }
+  ],
+  "actions": {
+    "install": "Install",
+    "preRelease": "pre-release",
+    "installSoon": "Coming soon",
+    "repo": "GitHub",
+    "repoSoon": "GitHub, public soon",
+    "how": "See how it works",
+    "issues": "Open an issue",
+    "contributing": "Contributing guide",
+    "security": "Security policy"
+  },
+  "hero": {
+    "h1": "Screenshots with annotations, built for GNOME on Wayland",
+    "sub": "Knivchit freezes your screen, lets you draw a rounded selection, mark it up with arrows, text and mosaic, then copy, save or pin the result. Everything stays on your machine.",
+    "badge": "Early preview · not stable yet",
+    "meta": "v{{VERSION}} does one thing: screenshots. Expect rough edges and breaking changes, and back up anything you care about. Tested on GNOME 50. Free and open source."
+  },
+  "slots": {
+    "overlay": {
+      "alt": "The Knivchit capture overlay: a rounded selection over the dimmed screen with an arrow, a rectangle and a mosaic area, and the annotation toolbar below.",
+      "caption": "The capture overlay: a rounded selection over a frozen screen, with the toolbar below.",
+      "previewAlt": "Interface preview of the Knivchit capture overlay: a rounded selection over a dimmed, simulated desktop with an arrow, a rectangle and a mosaic area, and the annotation toolbar below.",
+      "previewCaption": "Interface preview (rendered from the real interface over a simulated desktop): the capture overlay."
+    },
+    "hub": {
+      "alt": "The Knivchit main window: a narrow column with the sidebar, the capture card and the global shortcut status.",
+      "caption": "The main window sits in a narrow column on the right of the screen.",
+      "previewAlt": "Interface preview of the Knivchit main window: a narrow column with the sidebar, the capture card and the global shortcut status.",
+      "previewCaption": "Interface preview (rendered from the real interface): the main window."
+    },
+    "shortcuts": {
+      "alt": "The shortcuts card in Knivchit's settings, with the capture shortcut recorded.",
+      "caption": "Recording a shortcut in Settings.",
+      "previewAlt": "Interface preview of the shortcuts card in Knivchit's settings, with the capture shortcut recorded.",
+      "previewCaption": "Interface preview (rendered from the real interface): recording a shortcut in Settings."
+    }
+  },
+  "how": {
+    "id": "how-it-works",
+    "h2": "From screen to clipboard in three steps",
+    "intro": "The capture happens on a frozen copy of your screen, so nothing moves while you choose.",
+    "tabsAria": "Steps of a capture",
+    "steps": [
+      {
+        "id": "shortcut",
+        "title": "Press your shortcut",
+        "text": "You pick the key combination in Settings; Knivchit doesn't assign any. The screen freezes and dims."
+      },
+      {
+        "id": "annotate",
+        "title": "Select and annotate",
+        "text": "Drag a box, adjust it with the handles and mark what matters from the toolbar."
+      },
+      {
+        "id": "output",
+        "title": "Copy, save or pin",
+        "text": "Copy the image, save it to your folder, or leave it floating on screen while you work."
+      }
+    ],
+    "stage": {
+      "alt1": "Diagram of the first step: the dimmed screen with a rounded selection box and the hint to drag to select.",
+      "alt2": "Diagram of the second step: the selection with an arrow, a rectangle and a mosaic area, and the toolbar below.",
+      "alt3": "Diagram of the third step: the cropped capture floating over the desktop and a notice that it was saved and copied.",
+      "hint": "Drag to select · Esc to cancel",
+      "toast": "Saved and copied to the clipboard"
+    }
+  },
+  "tools": {
+    "id": "tools",
+    "h2": "Eight tools, each with its own cursor",
+    "intro": "Pick them from the toolbar or the keyboard: <kbd>Alt</kbd> plus the letter always works, even while you type text; the bare letter works when you aren't typing.",
+    "colors": "Six annotation colors. Keys are matched by physical position, so they work on any keyboard layout. The letters follow the Spanish tool names for now, because the interface is in Spanish.",
+    "list": [
+      { "icon": "select", "name": "Select", "keys": "Alt+H · H · V", "text": "Touch a shape to move or resize it." },
+      { "icon": "rect", "name": "Rectangle", "keys": "Alt+R · R", "text": "Frame a button, a paragraph or an error." },
+      { "icon": "ellipse", "name": "Ellipse", "keys": "Alt+O · O", "text": "Circle what you want to point out." },
+      { "icon": "arrow", "name": "Arrow", "keys": "Alt+F · F", "text": "Point at an exact spot in the image." },
+      { "icon": "pen", "name": "Pen", "keys": "Alt+L · L", "text": "Freehand strokes, to underline or cross out." },
+      { "icon": "text", "name": "Text", "keys": "Alt+T · T", "text": "Type a note straight onto the capture. Editable afterwards, with alignment." },
+      { "icon": "mosaic", "name": "Mosaic", "keys": "Alt+M · M", "text": "Paint over what shouldn't be seen: passwords, names, addresses." },
+      { "icon": "eraser", "name": "Eraser", "keys": "Alt+B · B", "text": "Remove a drawn shape you don't want to keep." }
+    ]
+  },
+  "edit": {
+    "id": "editing",
+    "h2": "Mistakes are cheap",
+    "intro": "What you draw stays editable until you finish the capture.",
+    "points": [
+      {
+        "title": "Move and resize",
+        "text": "With Select you drag any shape and resize it from its corners, or move one end of an arrow. The capture selection itself also moves and resizes with eight handles."
+      },
+      {
+        "title": "Undo and redo",
+        "text": "<kbd>Ctrl</kbd> <kbd>Z</kbd> undoes the last stroke and <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd> brings it back."
+      },
+      {
+        "title": "Mosaic as a brush",
+        "text": "Mosaic is painted like a thick stroke, not a box, so you cover only what you need to hide."
+      },
+      {
+        "title": "Native resolution",
+        "text": "The crop and the annotations are composed at your screen's real resolution, not the preview's."
+      }
+    ],
+    "outputsTitle": "When you finish",
+    "outputs": [
+      { "keys": "Enter · Ctrl+C", "text": "Copy and close" },
+      { "keys": "Ctrl+S", "text": "Save to your folder" },
+      { "keys": "Ctrl+Shift+S", "text": "Save as…" },
+      { "keys": "Toolbar", "text": "Pin on screen" },
+      { "keys": "Esc", "text": "Cancel" }
+    ],
+    "pinNote": "A pinned capture is a borderless window you can drag. Keeping it above other windows needs the GNOME Shell extension to be active."
+  },
+  "why": {
+    "id": "why",
+    "h2": "Why another screenshot tool",
+    "intro": "On Wayland, GNOME decides what an application may do. Knivchit is built around that instead of fighting it.",
+    "points": [
+      {
+        "title": "Made for modern GNOME",
+        "text": "On Wayland a regular app can't register global shortcuts, place its own window or stay above others. A small GNOME Shell extension does exactly that and nothing else; the app does the rest."
+      },
+      {
+        "title": "Careful design",
+        "text": "A rounded selection, matching dark and light themes, and motion that respects your reduced-motion setting. The page you're reading uses the same tokens as the app."
+      },
+      {
+        "title": "Predictable",
+        "text": "It captures once and works on that image, so what ends up in the file is what you saw when you pressed the shortcut."
+      }
+    ]
+  },
+  "settings": {
+    "id": "settings",
+    "h2": "Shortcuts are yours to choose",
+    "intro": "Knivchit ships with no global shortcut. You record one in Settings and it warns you if it clashes with a GNOME one. The main window is a narrow column on the right of the screen; the extension places it, because on Wayland an app can't position its own window.",
+    "points": [
+      {
+        "title": "Record any combination",
+        "text": "Press the keys you want while recording. The result is applied through the extension, so it works across GNOME."
+      },
+      {
+        "title": "Dark, light or system",
+        "text": "The app follows GNOME's preference or the one you set. This page does the same."
+      },
+      {
+        "title": "Your save folder",
+        "text": "Choose where captures land (the default is a Knivchit folder inside Pictures) and open it from Home. Launching at login is optional and off by default."
+      }
+    ]
+  },
+  "privacy": {
+    "id": "privacy",
+    "h2": "Your screen stays on your machine",
+    "intro": "Knivchit has no server, no accounts and no cloud. What you capture goes to the folder you choose or to the clipboard, and nowhere else.",
+    "items": [
+      {
+        "title": "No accounts, no telemetry",
+        "text": "There is no sign-up and no usage statistics are sent. This page has no analytics or cookies either."
+      },
+      {
+        "title": "No network unless you ask",
+        "text": "The app's only connection is “Check for updates” in About, and only when you click it. The extension never uses the network."
+      },
+      {
+        "title": "The extension does the minimum",
+        "text": "It registers the shortcut you chose, keeps pinned windows on top and places the main window. It doesn't read the clipboard or what you type."
+      },
+      {
+        "title": "The keyboard, only while recording a shortcut",
+        "text": "While you record a combination the extension grabs the keyboard for a few seconds to read it. Only the final combination is used, and the grab is always released: when done, on Esc, on a click or on timeout."
+      },
+      {
+        "title": "Clipboard history will be off by default",
+        "text": "It doesn't exist yet. When it arrives it will be opt-in, and its contents will never be written to logs."
+      }
+    ],
+    "license": "The app is MIT licensed and the GNOME Shell extension is GPL-3.0-or-later."
+  },
+  "soon": {
+    "id": "soon",
+    "h2": "From screenshot tool to digital Swiss Army knife",
+    "intro": "Today Knivchit does one thing: screenshots. The plan is to bring together what currently takes several separate tools. None of the following exists yet, and there are no dates.",
+    "list": [
+      { "icon": "clip", "name": "Clipboard history", "text": "Get back what you copied earlier, search it and paste it again." },
+      { "icon": "ocr", "name": "Text from the screen (OCR)", "text": "Extract the text from any area of the screen instead of retyping it." },
+      { "icon": "translate", "name": "Translation", "text": "Translate that text without leaving what you're doing." },
+      { "icon": "emoji", "name": "Emoji panel", "text": "A quick picker to insert emoji." },
+      { "icon": "sticker", "name": "Stickers", "text": "Browse and insert stickers from the same panel." }
+    ],
+    "visual": "The capture toolbar already reserves their place, disabled."
+  },
+  "install": {
+    "id": "install",
+    "h2": "Install",
+    "intro": "Two pieces: the app (an AppImage) and a GNOME Shell extension.",
+    "alphaStrip": "<strong>Early preview, not stable yet.</strong> Expect rough edges and breaking changes, and back up anything you care about.",
+    "noRelease": "No release published yet. These commands apply from the first release.",
+    "req": {
+      "title": "Requirements",
+      "items": [
+        "GNOME on Wayland (tested on 50).",
+        "Xwayland (on by default in Fedora and Ubuntu).",
+        "<code>fuse3</code>, or <code>--appimage-extract-and-run</code>.",
+        "<code>curl</code>, <code>python3</code>, <code>sha256sum</code> (for the script)."
+      ],
+      "language": "The app's interface is in Spanish for now (English planned)."
+    },
+    "script": {
+      "title": "With the script",
+      "intro": "Downloads the latest release (a pre-release while no stable one exists), verifies the checksums and installs the app and the extension.",
+      "command": "curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/kevincharp/knivchit/main/install.sh -o install.sh &amp;&amp; less install.sh &amp;&amp; bash install.sh",
+      "commandLabel": "Install command",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyFailed": "Select and copy manually",
+      "copyAria": "Copy the install command",
+      "read": "Opens the script in <code>less</code> first; press <code>q</code> to continue. <code>--stable</code> requires a stable version; <code>--version v0.1.0-alpha.1</code> pins one.",
+      "after": "It prints “installing PRE-RELEASE …” first. When done, log out and back in once, then assign your shortcut in Settings."
+    },
+    "hand": {
+      "title": "By hand",
+      "steps": [
+        {
+          "title": "Download",
+          "text": "AppImage, extension zip and <code>SHA256SUMS</code> from the release page."
+        },
+        {
+          "title": "Check the sums",
+          "text": "",
+          "code": "sha256sum -c SHA256SUMS --ignore-missing"
+        },
+        {
+          "title": "Install the extension",
+          "text": "",
+          "code": "gnome-extensions install --force knivchit-extension-*.zip\ngnome-extensions enable knivchit@knivchit.dev"
+        },
+        {
+          "title": "Run the app",
+          "text": "Run it, log out and back in once, then assign your shortcut in Settings.",
+          "code": "chmod +x knivchit*.AppImage"
+        }
+      ]
+    }
+  },
+  "faq": {
+    "id": "faq",
+    "h2": "Frequently asked questions",
+    "list": [
+      {
+        "q": "Is it stable?",
+        "a": "No. Knivchit is an early preview (alpha). There are no compatibility guarantees between versions: settings and data may be migrated or reset, and things can break. Back up anything you care about, and report problems through issues. While no stable release exists, the installer picks the latest pre-release (<code>--stable</code> refuses that).",
+        "repoLinked": "No. Knivchit is an early preview (alpha). There are no compatibility guarantees between versions: settings and data may be migrated or reset, and things can break. Back up anything you care about, and report problems through <a href=\"{{REPO_URL}}/issues/new/choose\" rel=\"noopener\">issues</a>. While no stable release exists, the installer picks the latest pre-release (<code>--stable</code> refuses that)."
+      },
+      {
+        "q": "Does it work on KDE, X11 or other desktops?",
+        "a": "Knivchit is designed and tested for GNOME on Wayland only. Other desktops and X11 sessions are untested, and nothing is promised there."
+      },
+      {
+        "q": "Which GNOME versions are supported?",
+        "a": "Tested on GNOME 50 on Wayland. The extension declares support for 50 only; widening that means testing each version first."
+      },
+      {
+        "q": "Why does it need a GNOME Shell extension?",
+        "a": "On GNOME with Wayland an app can't register global shortcuts, place its window or keep another one on top. Only GNOME Shell can, and the extension is limited to exactly that."
+      },
+      {
+        "q": "Is it safe? What can it access?",
+        "a": "The app has no server and makes no network requests except “Check for updates”, when you click it. The extension doesn't use the network or read the clipboard, and it grabs the keyboard only while you record a shortcut. The installer verifies SHA-256 sums before installing anything. Both the app and the extension are open source."
+      },
+      {
+        "q": "Where are captures saved?",
+        "a": "In the folder you pick in Settings. The default is a <code>Knivchit</code> folder inside your Pictures directory. Copying to the clipboard doesn't write a file."
+      },
+      {
+        "q": "How do I uninstall it?",
+        "a": "Run <code>bash install.sh --uninstall</code>. It removes the app, the service, launch-at-login and the extension. Your captures stay where they are."
+      },
+      {
+        "q": "Why is the interface in Spanish?",
+        "a": "The project started in Spanish and the app has not been translated yet. An English interface is planned; there is no date."
+      },
+      {
+        "q": "How do I report a bug or suggest an idea?",
+        "a": "Open an issue with the bug or feature template. Knivchit is issues-first: the maintainer handles issues, and pull requests are only accepted for an issue that was approved first, or for very small fixes.",
+        "repoLinked": "Open an issue with the bug or feature template on <a href=\"{{REPO_URL}}/issues/new/choose\" rel=\"noopener\">GitHub</a>. Knivchit is issues-first: the maintainer handles issues, and pull requests are only accepted for an issue that was approved first, or for very small fixes."
+      },
+      {
+        "q": "What license is it under?",
+        "a": "The app is MIT; the GNOME Shell extension is GPL-3.0-or-later; the site and docs are MIT."
+      },
+      {
+        "q": "Where is the code?",
+        "a": "The repository isn't public yet. When it is, the link will appear on this page.",
+        "repoLinked": "The code is in the <a href=\"{{REPO_URL}}\" rel=\"noopener\">public repository</a>."
+      },
+      {
+        "q": "Will there be clipboard history, OCR or emoji?",
+        "a": "That's the intention, which is why they appear under “Coming soon”. Today they don't exist and there's no date."
+      }
+    ]
+  },
+  "contribute": {
+    "id": "contribute",
+    "h2": "Contributing",
+    "intro": "Knivchit is issues-first and has a single maintainer with limited time.",
+    "points": [
+      {
+        "title": "Open an issue",
+        "text": "The normal way to help is to open an issue with the bug or feature template. The maintainer fixes it."
+      },
+      {
+        "title": "Pull requests, by invitation",
+        "text": "A PR is accepted only against an issue the maintainer has approved, or for a very small, self-contained fix such as a typo. Larger PRs without an approved issue are closed unreviewed, and there's no promise of a fast review."
+      },
+      {
+        "title": "Security problems",
+        "text": "Report vulnerabilities privately through GitHub's private vulnerability reporting, never in a public issue."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "Knivchit v{{VERSION}}, early preview. Free, open source and without tracking.",
+    "licenses": "The app is MIT; the GNOME Shell extension is GPL-3.0-or-later.",
+    "fonts": "Typefaces: <a href=\"/assets/fonts/LICENSE-Inter.txt\">Inter</a> and <a href=\"/assets/fonts/LICENSE-Bricolage-Grotesque.txt\">Bricolage Grotesque</a>, SIL OFL 1.1, hosted on this site.",
+    "created": "Created by <a href=\"https://github.com/kevincharp\" rel=\"noopener\">Kevin Charpentier</a>.",
+    "noTracking": "No cookies, no analytics, no third-party services."
+  },
+  "notFound": {
+    "title": "Page not found · Knivchit",
+    "h1": "This page doesn't exist",
+    "text": "The link may be mistyped or the page may be gone.",
+    "back": "Back to home"
+  }
+}

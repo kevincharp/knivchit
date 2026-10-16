@@ -1,0 +1,66 @@
+# ==============================================================================
+# .gitignore de Knivchit. Cubre lo universal (secretos, logs, editores, dependencias,
+# builds) y, más abajo, lo específico de Rust/Tauri y de la extensión.
+# ==============================================================================
+
+# Secretos y configuración local — NUNCA versionar
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+secrets*
+
+# Logs y temporales
+*.log
+logs/
+tmp/
+*.tmp
+
+# Builds y artefactos
+dist/
+build/
+out/
+coverage/
+
+# Caches de dependencias y herramientas
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.cache/
+
+# Ruido de SO y editores (por si un colaborador no tiene gitignore global)
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Estado local de herramientas por-máquina
+.claude
+CLAUDE.local.md
+
+# --- Específico de este stack ---
+# Rust / Tauri
+/app/target/
+/app/src-tauri/target/
+/app/src-tauri/Cargo.lock.bak
+
+# Node (frontend Tauri)
+/app/dist/
+
+# Extensión GNOME Shell (GJS): sin build propio, nada que ignorar aparte
+# de lo ya cubierto arriba (node_modules, dist).
+
+# Material de diseño local: no se commitea
+/[b]lueprints/
+.obsidian/
+
+# Capturas de página completa de la landing: regenerables, pesan ~1,4 MB
+/landing/capturas/*-pagina-completa.png
+
+# Capturas reales sin procesar (fuente de landing/scripts/imagenes.mjs): pesadas, no se versionan
+/landing/fuentes/

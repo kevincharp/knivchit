@@ -1,0 +1,50 @@
+Licenses of this repository
+===========================
+
+This repository bundles several parts and each has its own license. The one
+that applies is the license of the folder the file lives in.
+
+  app/          MIT                     Full text in app/LICENSE
+  extension/    GPL-3.0-or-later        Full text in extension/LICENSE
+                                        (the extension runs inside GNOME
+                                        Shell, which is GPL; it follows suit)
+
+  landing/site/assets/fonts/
+                Inter                   SIL Open Font License 1.1
+                                        Text: LICENSE-Inter.txt (same folder)
+                Bricolage Grotesque     SIL Open Font License 1.1
+                                        Text: LICENSE-Bricolage-Grotesque.txt
+                                        (same folder)
+
+  Everything else: MIT (text at the end of this file). This includes landing/
+  (templates, scripts, texts and site design), docs/ (documentation),
+  .github/ and the files in the repository root.
+
+If you add a dependency or a resource with its own license (fonts, icons,
+images), include its license text next to the file and add it to this list.
+
+------------------------------------------------------------------------------
+MIT license for landing/, docs/ and everything not listed above
+------------------------------------------------------------------------------
+
+MIT License
+
+Copyright (c) 2026 Kevin Charpentier
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

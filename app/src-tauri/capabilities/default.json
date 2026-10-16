@@ -1,0 +1,32 @@
+{
+	"$schema": "../gen/schemas/desktop-schema.json",
+	"identifier": "default",
+	"description": "Capability for the main window",
+	"windows": ["main"],
+	"permissions": [
+		"core:app:allow-version",
+		"core:window:allow-close",
+		"core:window:allow-minimize",
+		"core:window:allow-start-dragging",
+		"core:event:allow-listen",
+		"core:event:allow-unlisten",
+		"allow-start-capture",
+		"allow-get-capture-permission",
+		"allow-request-capture-permission",
+		"allow-get-integration-status",
+		"allow-choose-save-dir",
+		"allow-open-save-dir",
+		"allow-get-autostart",
+		"allow-set-autostart",
+		"allow-get-shortcuts",
+		"allow-set-shortcut",
+		"allow-check-shortcut-conflicts",
+		"allow-record-shortcut",
+		"allow-quit-app",
+		"allow-get-panel-icon",
+		"allow-set-panel-icon",
+		"allow-get-settings",
+		"allow-update-settings",
+		"allow-check-for-update"
+	]
+}

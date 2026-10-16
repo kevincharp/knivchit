@@ -1,0 +1,34 @@
+{
+  "overlay": {
+    "widths": [
+      640,
+      1280,
+      1920,
+      2560
+    ],
+    "width": 2560,
+    "height": 1600,
+    "avif": false,
+    "simulated": true
+  },
+  "hub": {
+    "widths": [
+      360,
+      720
+    ],
+    "width": 720,
+    "height": 1080,
+    "avif": false,
+    "simulated": true
+  },
+  "shortcuts": {
+    "widths": [
+      480,
+      960
+    ],
+    "width": 960,
+    "height": 650,
+    "avif": false,
+    "simulated": true
+  }
+}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="{{meta.lang}}" data-theme-pref="system">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{notFound.title}}</title>
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<script src="/assets/js/theme-init.js"></script>
+<link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body class="nf">
+{{> icons}}
+<main class="nf-main" id="main">
+  <svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg>
+  <h1>{{notFound.h1}}</h1>
+  <p>{{notFound.text}}</p>
+  <a class="btn btn-main" href="/">{{notFound.back}}</a>
+</main>
+</body>
+</html>

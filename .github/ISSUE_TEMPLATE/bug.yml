@@ -1,0 +1,78 @@
+name: Report a bug
+description: Something does not work as it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Do not paste your clipboard contents or screenshots with personal data.** If this is a security vulnerability, do not use this form: read SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: In About, or the AppImage / release version.
+      placeholder: "0.1.0-alpha.1"
+    validations:
+      required: true
+  - type: input
+    id: gnome
+    attributes:
+      label: GNOME Shell version
+      description: Output of `gnome-shell --version`.
+      placeholder: "GNOME Shell 50.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: session
+    attributes:
+      label: Session type
+      description: Output of `echo $XDG_SESSION_TYPE`.
+      options:
+        - Wayland
+        - X11
+        - I don't know
+    validations:
+      required: true
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution
+      placeholder: "Fedora 44"
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you installed it
+      options:
+        - Installer (install.sh)
+        - AppImage by hand
+        - Built from source
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected to happen
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened
+      description: If it helps, add a screenshot or a short video.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        The app's output when launched from a terminal and, if it involves the shortcut, `journalctl --user -b | grep -i -E "gnome-shell|extension"`.
+        Review before pasting: **no clipboard contents, no private paths or data.**
+      render: text

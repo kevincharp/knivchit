@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+@theme {
+	--color-bg: #0a0e1a;
+	--color-bg-alt: #0a0c13;
+	--color-accent: #4c82ff;
+	--color-accent-warm: #e8a33d;
+
+	/* Marca (logo e icono): la madera NO es un color de interfaz. */
+	--color-brand-blade: #4c82ff;
+	--color-brand-wood: #b0764a;
+	--color-brand-wood-deep: #6e4527;
+	--color-fg: #eef0f5;
+	--color-fg-alt: #f1f3f8;
+	--color-fg-muted: #8f9bb3;
+	--color-fg-muted-alt: #b9bec9;
+	--radius-capture: 24px;
+	--radius-sharp: 3px;
+	--radius-ui: 14px;
+
+	/* Capturador: píldora clara (sin sombra; se separa con borde y blur). */
+	--color-pill: rgba(238, 240, 245, 0.94);
+	--color-pill-border: rgba(10, 14, 26, 0.13);
+	--color-pill-divider: rgba(10, 14, 26, 0.13);
+	--color-pill-ink: #3a3d48;
+	--color-pill-ink-disabled: #a3a8b5;
+	--color-pill-hover: rgba(10, 14, 26, 0.07);
+	--color-on-accent: #ffffff;
+	--color-toolbar-icon: #0e111b;
+	--color-toolbar-divider: rgba(10, 14, 26, 0.22);
+	--color-scrim: rgba(4, 5, 8, 0.55);
+	--color-selection-fill: rgba(76, 130, 255, 0.05);
+	--color-glass: rgba(27, 32, 48, 0.72);
+	/* Como --color-glass pero sin depender del blur para la legibilidad: para
+	   superficies que se reposicionan en cada frame de un arrastre (la
+	   etiqueta de dimensiones), donde backdrop-filter es caro en WebKitGTK. */
+	--color-glass-solid: rgba(14, 16, 24, 0.92);
+
+	/* Colores de anotación. */
+	--color-ann-red: #ff4d4f;
+	--color-ann-amber: #e8a33d;
+	--color-ann-blue: #4c82ff;
+	--color-ann-green: #3ddc84;
+	--color-ann-white: #ffffff;
+	--color-ann-black: #0a0e1a;
+
+	--duration-ui: 180ms;
+
+	/* Hub (ventana principal): superficies planas, separadas por borde de 1 px. */
+	--color-card: rgba(238, 240, 245, 0.04);
+	--color-card-hover: rgba(238, 240, 245, 0.08);
+	--color-card-border: rgba(238, 240, 245, 0.1);
+	--color-ok: #3ddc84;
+	--color-badge: rgba(232, 163, 61, 0.16);
+	--color-badge-ink: #f0bd6a;
+	/* El azul de marca (--color-accent) es para bordes, manijas y esquinas de
+	   visor. Con texto blanco encima solo da 3,53:1 (no pasa AA), así que los
+	   rellenos con texto usan --color-accent-fill (4,79:1) y el acento como
+	   texto sobre el fondo, --color-accent-ink. */
+	--color-accent-fill: #3a69ea;
+	/* Marco de la ventana principal (barra de título) y barra lateral. */
+	--color-chrome: #05070d;
+	--color-side: #080a12;
+	/* Maqueta de captura de la tarjeta del capturador. */
+	--color-shot: #0e1424;
+	--color-accent-ink: #4c82ff;
+}
+
+/* Tema claro de la ventana principal. Solo la ventana main aplica
+   data-theme (ver lib/theme.ts): el overlay, el pin y la toolbar del
+   capturador no lo reciben y siguen con los valores de arriba.
+   Contraste (WCAG, texto/fondo): fg 17,3 · atenuado 6,9 (barra 6,3) ·
+   acento-ink 6,0 sobre tarjeta · ok 5,6 · aviso 5,4 · insignia 6,3 ·
+   blanco sobre acento-fill 4,79. Verificado en theme.contrast.test.ts. */
+:root[data-theme="light"] {
+	color-scheme: light;
+	--color-bg: #f4f6fb;
+	--color-bg-alt: #e8ecf5;
+	--color-fg: #0e1220;
+	--color-fg-muted: #4a5570;
+	--color-accent-warm: #9a5b00;
+	--color-accent-ink: #2559d6;
+	--color-card: #ffffff;
+	--color-card-hover: #eef1f8;
+	--color-card-border: rgba(14, 18, 32, 0.12);
+	--color-ok: #11783a;
+	--color-badge: rgba(232, 163, 61, 0.22);
+	--color-badge-ink: #7a4b00;
+	--color-selection-fill: rgba(76, 130, 255, 0.08);
+	--color-chrome: #d9dfee;
+	--color-side: #e8ecf5;
+	--color-shot: #dfe5f1;
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+}
+
+/* Sin parpadeo de color antes de que React pinte (solo la ventana main). */
+:root[data-theme] body {
+	background: var(--color-chrome);
+	color: var(--color-fg);
+}
+
+/* Superficies de gesto (overlay de captura, pin): WebKitGTK inicia un arrastre
+   nativo con fantasma si hay algo seleccionable o arrastrable bajo el puntero. */
+.capture-surface,
+.capture-surface * {
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-touch-callout: none;
+}
+
+.capture-surface textarea {
+	user-select: text;
+	-webkit-user-select: text;
+}
+
+/* Cursores del overlay: lo clicable señala, lo desactivado prohíbe y el texto
+   estático es el normal (la superficie de gesto hereda su propia cruz). */
+.capture-surface [data-capture-toolbar],
+.capture-surface [data-capture-hint] {
+	cursor: default;
+}
+
+.capture-surface [data-capture-toolbar] button:not(:disabled),
+.capture-surface [data-capture-hint] button {
+	cursor: pointer;
+}
+
+.capture-surface [data-capture-toolbar] button:disabled {
+	cursor: not-allowed;
+}

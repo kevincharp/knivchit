@@ -1,0 +1,8 @@
+{
+  "_nota": "Constantes únicas del sitio. REPO_URL y RELEASE_URL vacías = marcador «Disponible próximamente»; al rellenarlas y ejecutar `node landing/scripts/build.mjs`, los enlaces se activan. SITE_URL es el dominio final (aún sin decidir): se puede sobrescribir con la variable de entorno SITE_URL.",
+  "SITE_URL": "https://knivchit.pages.dev",
+  "REPO_URL": "",
+  "RELEASE_URL": "",
+  "VERSION": "0.1.0-alpha.1",
+  "LOCALE": "en"
+}

@@ -1,0 +1,98 @@
+name: Release
+
+"on":
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    uses: ./.github/workflows/ci.yml
+
+  # Build con token de solo lectura: pnpm install y build.rs ejecutan codigo de terceros
+  build:
+    needs: gate
+    runs-on: ubuntu-22.04
+    env:
+      BUNDLE_DIR: app/src-tauri/target/release/bundle/appimage
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Comprobar que la etiqueta coincide con la versión
+        run: |
+          version=$(grep -m1 '^version' app/src-tauri/Cargo.toml | sed -E 's/version = "(.*)"/\1/')
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::La etiqueta ${GITHUB_REF_NAME} no coincide con la versión v${version} de Cargo.toml"
+            exit 1
+          fi
+
+      - name: Configurar Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 12.4.1
+
+      - name: Configurar toolchain de Rust
+        uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
+
+      - name: Instalar dependencias de sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev librsvg2-dev libfuse2 libglib2.0-bin
+
+      - name: Instalar dependencias de la app
+        run: cd app && pnpm install --frozen-lockfile
+
+      - name: Build de la app y empaquetado AppImage
+        run: cd app && APPIMAGE_EXTRACT_AND_RUN=1 NO_STRIP=1 pnpm tauri build --bundles appimage
+
+      - name: Empaquetar la extension GNOME
+        run: ./extension/package.sh "$BUNDLE_DIR"
+
+      - name: Generar checksums
+        run: |
+          cd "$BUNDLE_DIR"
+          sha256sum *.AppImage *.zip > SHA256SUMS
+
+      - name: Subir artefactos
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-bundle
+          path: |
+            ${{ env.BUNDLE_DIR }}/*.AppImage
+            ${{ env.BUNDLE_DIR }}/*.zip
+            ${{ env.BUNDLE_DIR }}/SHA256SUMS
+          if-no-files-found: error
+
+  # Unico job con permiso de escritura: no ejecuta codigo del repo, solo publica
+  publish:
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Descargar artefactos
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-bundle
+          path: bundle
+
+      - name: Crear release en GitHub
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          # Una etiqueta con sufijo (v0.1.0-alpha.1, -beta.1, -rc.1) se publica como pre-release
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            bundle/*.AppImage
+            bundle/*.zip
+            bundle/SHA256SUMS

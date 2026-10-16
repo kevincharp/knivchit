@@ -1,0 +1,36 @@
+name: PR hygiene
+
+"on":
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+# pull_request_target corre con el codigo de la rama base y NUNCA hace checkout del PR:
+# solo lee titulo y cuerpo, asi que no ejecuta codigo de terceros con token de escritura.
+permissions: {}
+
+jobs:
+  comprobar:
+    # Dependabot no enlaza issues: se revisa por su cuenta
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-22.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      PR_BODY: ${{ github.event.pull_request.body }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Title follows Conventional Commits
+        run: |
+          if ! printf '%s' "$PR_TITLE" | grep -Eq '^(feat|fix|docs|refactor|chore|test|ci|perf|build)(\([a-z0-9-]+\))?!?: .+'; then
+            echo "::error::The title must follow Conventional Commits: type(scope): description"
+            exit 1
+          fi
+
+      - name: PR links an issue
+        run: |
+          if ! printf '%s' "$PR_BODY" | grep -Eqi '(closes|fixes|resolves|refs?|cierra|resuelve) +#[0-9]+'; then
+            echo "::error::The PR must link an accepted issue (for example: Closes #12). See CONTRIBUTING.md"
+            exit 1
+          fi

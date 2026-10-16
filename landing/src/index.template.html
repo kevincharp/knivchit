@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="{{meta.lang}}" data-theme-pref="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{meta.title}}</title>
+<meta name="description" content="{{meta.description|attr}}">
+<link rel="canonical" href="{{cfg.SITE_URL}}/">
+<link rel="alternate" hreflang="{{meta.lang}}" href="{{cfg.SITE_URL}}/">
+<link rel="alternate" hreflang="x-default" href="{{cfg.SITE_URL}}/">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="{{meta.themeColorDark}}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Knivchit">
+<meta property="og:locale" content="{{meta.locale}}">
+<meta property="og:url" content="{{cfg.SITE_URL}}/">
+<meta property="og:title" content="{{meta.ogTitle|attr}}">
+<meta property="og:description" content="{{meta.ogDescription|attr}}">
+<meta property="og:image" content="{{cfg.SITE_URL}}/assets/img/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{meta.ogImageAlt|attr}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{meta.ogTitle|attr}}">
+<meta name="twitter:description" content="{{meta.ogDescription|attr}}">
+<meta name="twitter:image" content="{{cfg.SITE_URL}}/assets/img/og.jpg">
+<meta name="twitter:image:alt" content="{{meta.ogImageAlt|attr}}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script src="/assets/js/theme-init.js"></script>
+<link rel="stylesheet" href="/assets/css/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Knivchit",
+  "description": "{{meta.description|attr}}",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Linux (GNOME, Wayland)",
+  "softwareVersion": "{{cfg.VERSION}}",
+  "inLanguage": "{{meta.lang}}",
+  "url": "{{cfg.SITE_URL}}/",
+  {{#if has.release}}"downloadUrl": "{{cfg.RELEASE_URL}}",{{/if}}
+  {{#if has.repo}}"codeRepository": "{{cfg.REPO_URL}}",{{/if}}
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">{{ui.skip}}</a>
+{{> icons}}
+
+<header class="top">
+  <a class="brand" href="/" aria-label="{{ui.homeAria|attr}}"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></a>
+  <nav class="menu" aria-label="{{ui.navAria|attr}}">
+    <ul>
+      {{#each nav}}<li><a href="{{href}}">{{label}}</a></li>{{/each}}
+    </ul>
+  </nav>
+  <div class="theme" role="group" aria-label="{{ui.theme.label|attr}}" data-theme-switch>
+    <button type="button" data-set-theme="dark" aria-pressed="false" title="{{ui.theme.dark|attr}}"><svg class="g" aria-hidden="true"><use href="#i-moon"/></svg><span class="vh">{{ui.theme.dark}}</span></button>
+    <button type="button" data-set-theme="light" aria-pressed="false" title="{{ui.theme.light|attr}}"><svg class="g" aria-hidden="true"><use href="#i-sun"/></svg><span class="vh">{{ui.theme.light}}</span></button>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="hero-screen" aria-hidden="true">
+      <span class="dw dw-code"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="dw dw-term"><i></i><i></i><i></i></span>
+      <span class="dw dw-web"><b></b><i></i><i></i><i></i></span>
+    </div>
+    <div class="hero-frame">
+      <div class="hero-sel" data-hero-sel>
+        <span class="rd" data-readout aria-hidden="true"></span>
+        <div class="hero-brand" aria-hidden="true"><svg class="logo"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></div>
+        <p class="status">{{hero.badge}}</p>
+        <h1 id="hero-h">{{hero.h1}}</h1>
+        <p class="lead">{{hero.sub}}</p>
+        <p class="meta">{{hero.meta}}</p>
+        <i class="hd nw"></i><i class="hd n"></i><i class="hd ne"></i><i class="hd e"></i>
+        <i class="hd se"></i><i class="hd s"></i><i class="hd sw"></i><i class="hd w"></i>
+      </div>
+      <div class="hero-pill">
+        {{#if has.release}}
+        <a class="btn btn-main" href="{{cfg.RELEASE_URL}}">{{actions.install}}</a>
+        <span class="soon-note">{{actions.preRelease}}</span>
+        {{else}}
+        <a class="btn btn-main" href="#install" aria-describedby="soon-note">{{actions.install}}</a>
+        <span class="soon-note" id="soon-note">{{actions.installSoon}}</span>
+        {{/if}}
+        {{#if has.repo}}
+        <a class="btn btn-ghost" href="{{cfg.REPO_URL}}" rel="noopener">{{actions.repo}}</a>
+        {{else}}
+        <span class="btn btn-ghost btn-off" aria-disabled="true">{{actions.repoSoon}}</span>
+        {{/if}}
+      </div>
+    </div>
+  </section>
+
+  <section class="sec see" aria-label="{{slots.overlay.alt|attr}}">
+    {{slotHtml.overlay}}
+  </section>
+
+  <section class="sec how" id="{{how.id}}" aria-labelledby="how-h">
+    <header class="sec-head">
+      <h2 id="how-h">{{how.h2}}</h2>
+      <p>{{how.intro}}</p>
+    </header>
+    <div class="how-grid">
+      <div class="steps" role="tablist" aria-label="{{how.tabsAria|attr}}" data-steps>
+        {{#each how.steps}}
+        <button class="step" type="button" role="tab" id="tab-{{id}}" aria-controls="stage-panel" aria-selected="{{#if @index}}false{{else}}true{{/if}}" tabindex="{{#if @index}}-1{{else}}0{{/if}}" data-step="{{@number}}">
+          <span class="step-n" aria-hidden="true">{{@number}}</span>
+          <span class="step-t">{{title}}</span>
+          <span class="step-d">{{text}}</span>
+        </button>
+        {{/each}}
+      </div>
+      <div id="stage-panel" role="tabpanel" aria-labelledby="tab-shortcut" class="stage-panel">
+        {{> stage}}
+      </div>
+    </div>
+  </section>
+
+  <section class="sec tools" id="{{tools.id}}" aria-labelledby="tools-h">
+    <header class="sec-head">
+      <h2 id="tools-h">{{tools.h2}}</h2>
+      <p>{{tools.intro}}</p>
+    </header>
+    <ul class="toolist">
+      {{#each tools.list}}
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-{{icon}}"/></svg></span>
+        <div><h3>{{name}}</h3><p>{{text}}</p></div>
+        <span class="tk">{{keys}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    <p class="fine">{{tools.colors}}</p>
+  </section>
+
+  <section class="sec edit" id="{{edit.id}}" aria-labelledby="edit-h">
+    <header class="sec-head">
+      <h2 id="edit-h">{{edit.h2}}</h2>
+      <p>{{edit.intro}}</p>
+    </header>
+    <div class="edit-grid">
+      <dl class="points">
+        {{#each edit.points}}<div><dt>{{title}}</dt><dd>{{text}}</dd></div>{{/each}}
+      </dl>
+      <div class="outs">
+        <h3>{{edit.outputsTitle}}</h3>
+        <ul>
+          {{#each edit.outputs}}<li><span>{{text}}</span><span class="tk">{{keys}}</span></li>{{/each}}
+        </ul>
+        <p class="fine">{{edit.pinNote}}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec why" id="{{why.id}}" aria-labelledby="why-h">
+    <header class="sec-head">
+      <h2 id="why-h">{{why.h2}}</h2>
+      <p>{{why.intro}}</p>
+    </header>
+    <dl class="points points-3">
+      {{#each why.points}}<div><dt>{{title}}</dt><dd>{{text}}</dd></div>{{/each}}
+    </dl>
+  </section>
+
+  <section class="sec settings" id="{{settings.id}}" aria-labelledby="settings-h">
+    <header class="sec-head">
+      <h2 id="settings-h">{{settings.h2}}</h2>
+      <p>{{settings.intro}}</p>
+    </header>
+    <dl class="points points-3">
+      {{#each settings.points}}<div><dt>{{title}}</dt><dd>{{text}}</dd></div>{{/each}}
+    </dl>
+    <div class="shots-row">
+      {{slotHtml.hub}}
+      {{slotHtml.shortcuts}}
+    </div>
+  </section>
+
+  <section class="sec privacy" id="{{privacy.id}}" aria-labelledby="priv-h">
+    <header class="sec-head">
+      <h2 id="priv-h">{{privacy.h2}}</h2>
+      <p>{{privacy.intro}}</p>
+    </header>
+    <ul class="priv-list">
+      {{#each privacy.items}}<li><h3>{{title}}</h3><p>{{text}}</p></li>{{/each}}
+    </ul>
+    <p class="fine">{{privacy.license}}</p>
+  </section>
+
+  <section class="sec soon" id="{{soon.id}}" aria-labelledby="soon-h">
+    <header class="sec-head">
+      <h2 id="soon-h">{{soon.h2}}</h2>
+      <p>{{soon.intro}}</p>
+    </header>
+    <div class="road-grid">
+    <ul class="road">
+      {{#each soon.list}}
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-{{icon}}"/></svg></span>
+        <div><h3>{{name}}</h3><p>{{text}}</p></div>
+        <span class="badge">{{$.ui.soon}}</span>
+      </li>
+      {{/each}}
+    </ul>
+    <div class="road-visual" aria-hidden="true">
+      <div class="pill-bar"><span class="pb off"><svg class="g"><use href="#i-ocr"/></svg></span><span class="pb off"><svg class="g"><use href="#i-translate"/></svg></span><span class="pb off"><svg class="g"><use href="#i-qr"/></svg></span></div>
+      <p>{{soon.visual}}</p>
+    </div>
+    </div>
+  </section>
+
+  <section class="sec install" id="{{install.id}}" aria-labelledby="inst-h">
+    <header class="sec-head">
+      <h2 id="inst-h">{{install.h2}}</h2>
+      <p>{{install.intro}}</p>
+    </header>
+    <p class="alpha-strip">{{install.alphaStrip}}</p>
+    <div class="inst-cols">
+      <section class="inst-col" aria-labelledby="inst-req-h">
+        <h3 id="inst-req-h">{{install.req.title}}</h3>
+        <ul class="plain">{{#each install.req.items}}<li>{{value}}</li>{{/each}}</ul>
+        <p class="fine">{{install.req.language}}</p>
+      </section>
+      <section class="inst-col" aria-labelledby="inst-script-h">
+        <h3 id="inst-script-h">{{install.script.title}}</h3>
+        {{#if has.release}}{{else}}<p class="state">{{install.noRelease}}</p>{{/if}}
+        <p>{{install.script.intro}}</p>
+        <div class="cmd">
+          <pre class="code" tabindex="0" aria-label="{{install.script.commandLabel|attr}}"><code id="cmd-script">{{install.script.command}}</code></pre>
+          <button class="copy" type="button" data-copy="cmd-script" data-copied="{{install.script.copied|attr}}" data-failed="{{install.script.copyFailed|attr}}" aria-label="{{install.script.copyAria|attr}}">{{install.script.copy}}</button>
+          <span class="vh" role="status" data-copy-status></span>
+        </div>
+        <p class="fine">{{install.script.read}}</p>
+        <p class="fine">{{install.script.after}}</p>
+      </section>
+      <section class="inst-col" aria-labelledby="inst-hand-h">
+        <h3 id="inst-hand-h">{{install.hand.title}}</h3>
+        <ol class="inst-steps">
+          {{#each install.hand.steps}}
+          <li>
+            <h4>{{title}}</h4>
+            {{#if text}}<p>{{text}}</p>{{/if}}
+            {{#if code}}<pre class="code" tabindex="0"><code>{{code}}</code></pre>{{/if}}
+          </li>
+          {{/each}}
+        </ol>
+      </section>
+    </div>
+  </section>
+
+  <section class="sec faq" id="{{faq.id}}" aria-labelledby="faq-h">
+    <header class="sec-head"><h2 id="faq-h">{{faq.h2}}</h2></header>
+    <div class="faq-cols">
+      {{#each faq.cols}}
+      <div class="faq-col">
+        {{#each list}}
+        <details>
+          <summary>{{q}}</summary>
+          <p>{{#if repoLinked}}{{#if $.has.repo}}{{repoLinked}}{{else}}{{a}}{{/if}}{{else}}{{a}}{{/if}}</p>
+        </details>
+        {{/each}}
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section class="sec contribute" id="{{contribute.id}}" aria-labelledby="contrib-h">
+    <header class="sec-head">
+      <h2 id="contrib-h">{{contribute.h2}}</h2>
+      <p>{{contribute.intro}}</p>
+    </header>
+    <dl class="points points-3">
+      {{#each contribute.points}}<div><dt>{{title}}</dt><dd>{{text}}</dd></div>{{/each}}
+    </dl>
+    {{#if has.repo}}
+    <p class="links"><a class="btn btn-main" href="{{cfg.REPO_URL}}/issues/new/choose" rel="noopener">{{actions.issues}}</a> <a class="btn btn-line" href="{{cfg.REPO_URL}}/blob/main/CONTRIBUTING.md" rel="noopener">{{actions.contributing}}</a> <a class="btn btn-line" href="{{cfg.REPO_URL}}/security/policy" rel="noopener">{{actions.security}}</a></p>
+    {{/if}}
+  </section>
+</main>
+
+<footer class="foot" aria-label="{{ui.footerAria|attr}}">
+  <div class="foot-brand"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></div>
+  <p>{{footer.tagline}}</p>
+  <p>{{footer.licenses}}</p>
+  <p>{{#if has.repo}}<a href="{{cfg.REPO_URL}}" rel="noopener">{{actions.repo}}</a>{{else}}<span class="soon-text">{{actions.repoSoon}}</span>{{/if}}</p>
+  <p>{{footer.created}}</p>
+  <p class="fine">{{footer.noTracking}}</p>
+  <p class="legal">{{footer.fonts}}</p>
+</footer>
+
+<script src="/assets/js/main.js" defer></script>
+</body>
+</html>

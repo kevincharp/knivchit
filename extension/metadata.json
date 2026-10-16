@@ -1,0 +1,10 @@
+{
+  "uuid": "knivchit@knivchit.dev",
+  "name": "Knivchit Shortcuts",
+  "description": "Complemento de GNOME Shell para la aplicación Knivchit (capturador de pantalla). Registra el atajo de teclado que eliges en la app para iniciar una captura, mantiene encima las ventanas fijadas y coloca la ventana principal a la derecha de la pantalla.\n\nNo hace nada sin la aplicación Knivchit instalada. No usa la red ni accede al portapapeles. Al grabar un atajo desde la app captura el teclado solo para leer esa combinación; no guarda ni envía ninguna otra tecla.",
+  "settings-schema": "org.gnome.shell.extensions.knivchit",
+  "shell-version": [
+    "50"
+  ],
+  "url": "https://github.com/kevincharp/knivchit"
+}

@@ -1,0 +1,5 @@
+# Cloudflare Pages (despliegue directo con `wrangler pages deploy`). Ver README.md.
+# No despliega nada por sí solo: solo describe el proyecto.
+name = "knivchit"
+compatibility_date = "2026-10-15"
+pages_build_output_dir = "./site"

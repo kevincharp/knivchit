@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme-pref="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knivchit: screenshots with annotations for GNOME on Wayland</title>
+<meta name="description" content="Early preview of Knivchit, a screenshot tool for GNOME on Wayland. Rounded selection, arrows, text and a mosaic brush; copy, save or pin the result. Local only, no accounts, no telemetry.">
+<link rel="canonical" href="https://knivchit.pages.dev/">
+<link rel="alternate" hreflang="en" href="https://knivchit.pages.dev/">
+<link rel="alternate" hreflang="x-default" href="https://knivchit.pages.dev/">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0a0e1a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Knivchit">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://knivchit.pages.dev/">
+<meta property="og:title" content="Knivchit: screenshots with annotations for GNOME">
+<meta property="og:description" content="Select, annotate and pin your screen on GNOME with Wayland. Local only, no accounts, no telemetry.">
+<meta property="og:image" content="https://knivchit.pages.dev/assets/img/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Knivchit logo: a knife with a blue blade and a wooden handle, next to the word knivchit, on a dark navy background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Knivchit: screenshots with annotations for GNOME">
+<meta name="twitter:description" content="Select, annotate and pin your screen on GNOME with Wayland. Local only, no accounts, no telemetry.">
+<meta name="twitter:image" content="https://knivchit.pages.dev/assets/img/og.jpg">
+<meta name="twitter:image:alt" content="Knivchit logo: a knife with a blue blade and a wooden handle, next to the word knivchit, on a dark navy background">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script src="/assets/js/theme-init.js"></script>
+<link rel="stylesheet" href="/assets/css/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Knivchit",
+  "description": "Early preview of Knivchit, a screenshot tool for GNOME on Wayland. Rounded selection, arrows, text and a mosaic brush; copy, save or pin the result. Local only, no accounts, no telemetry.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Linux (GNOME, Wayland)",
+  "softwareVersion": "0.1.0-alpha.1",
+  "inLanguage": "en",
+  "url": "https://knivchit.pages.dev/",
+
+
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <!-- Glifos de la barra de captura: mismos trazos que app/src/components/capture/toolbarIcons.tsx (rejilla de 24, trazo 1,75). -->
+  <symbol id="i-select" viewBox="0 0 24 24"><path d="M6 4l12 7-5.5 1.5L10 18Z"/></symbol>
+  <symbol id="i-rect" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2.5"/></symbol>
+  <symbol id="i-ellipse" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M6 18 18 6"/><path d="M9 6h9v9"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 17c3-10 5-12 7-8s3 8 5 6 3-6 4-8"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.5 9V8h7v1M12 8v8M10.5 16h3"/></symbol>
+  <symbol id="i-mosaic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2.5"/><rect x="4" y="4" width="8" height="8" fill="currentColor"/><rect x="12" y="12" width="8" height="8" fill="currentColor"/></symbol>
+  <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m8 20-4-4 10-10a2 2 0 0 1 3 0l3 3a2 2 0 0 1 0 3L11 20ZM8 20h12"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M8 6 4 10l4 4M4 10h10a5 5 0 0 1 0 10h-3"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="m16 6 4 4-4 4M20 10H10a5 5 0 0 0 0 10h3"/></symbol>
+  <symbol id="i-ocr" viewBox="0 0 24 24"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3M9 9h6M12 9v6"/></symbol>
+  <symbol id="i-translate" viewBox="0 0 24 24"><path d="M4 6h8M8 4v2M6 6c0 3 3 6 6 7M12 6c0 3-3 6-6 7M13 20l4-9 4 9M14.5 17h5"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><path d="M4 4h6v6H4ZM14 4h6v6h-6ZM4 14h6v6H4ZM14 14h3v3h-3ZM20 14v6h-3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="m15 4 5 5-3 1-3 3 .5 4.5L12 15l-5 5M9 11l4-4"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-saveas" viewBox="0 0 24 24"><path d="m6 10 6 6 6-6"/></symbol>
+  <symbol id="i-cancel" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+  <symbol id="i-confirm" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+  <!-- Secciones de la ventana principal y de la web. -->
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7M6 10v9h12v-9"/></symbol>
+  <symbol id="i-capture" viewBox="0 0 24 24"><path d="M4 9V6a2 2 0 0 1 2-2h3M15 4h3a2 2 0 0 1 2 2v3M20 15v3a2 2 0 0 1-2 2h-3M9 20H6a2 2 0 0 1-2-2v-3"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2.5"/><path d="M9 5V4h6v1M9 11h6M9 15h4"/></symbol>
+  <symbol id="i-emoji" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M9 14.5c1.6 1.6 4.4 1.6 6 0M9.5 9.5h.01M14.5 9.5h.01"/></symbol>
+  <symbol id="i-sticker" viewBox="0 0 24 24"><path d="M5 5h14v9l-5 5H5Z"/><path d="M19 14h-5v5"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5 7.5 7.5 0 1 0 19 14.5Z"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+  <!-- Punta de flecha de las anotaciones de las maquetas (una sola definición). -->
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1.2 8.6 5 1 8.8" fill="none" stroke="#ff4d4f" stroke-width="1.7"/></marker></defs>
+  <!-- Marca: símbolo S7 de Knivchit (hoja azul, mango nogal). -->
+  <symbol id="i-logo" viewBox="0 8 64 48"><g transform="translate(0 -3)"><mask id="lg-b" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"/><rect x="6" y="38" width="48" height="16" rx="8" fill="#000" stroke="#000" stroke-width="3.4"/><g transform="translate(15 46) rotate(-34)"><circle cx="16.5" cy="-6.4" r="2.9" fill="#000"/></g></mask><mask id="lg-h" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"/><circle cx="15" cy="46" r="3.3" fill="#000"/></mask><g mask="url(#lg-b)"><path class="lg-blade" transform="translate(15 46) rotate(-34)" d="M0 -6.6 H23.9 C35.9 -6.6 43.2 -1.0 46 6.6 H0 Z"/></g><g mask="url(#lg-h)"><rect class="lg-wood" x="6" y="38" width="48" height="16" rx="8"/></g><circle class="lg-blade" cx="15" cy="46" r="1.7"/></g></symbol>
+</svg>
+
+
+<header class="top">
+  <a class="brand" href="/" aria-label="Knivchit, home"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></a>
+  <nav class="menu" aria-label="Main">
+    <ul>
+      <li><a href="#how-it-works">How it works</a></li><li><a href="#tools">Tools</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#soon">Coming soon</a></li><li><a href="#install">Install</a></li><li><a href="#faq">FAQ</a></li>
+    </ul>
+  </nav>
+  <div class="theme" role="group" aria-label="Theme" data-theme-switch>
+    <button type="button" data-set-theme="dark" aria-pressed="false" title="Dark"><svg class="g" aria-hidden="true"><use href="#i-moon"/></svg><span class="vh">Dark</span></button>
+    <button type="button" data-set-theme="light" aria-pressed="false" title="Light"><svg class="g" aria-hidden="true"><use href="#i-sun"/></svg><span class="vh">Light</span></button>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="hero-screen" aria-hidden="true">
+      <span class="dw dw-code"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="dw dw-term"><i></i><i></i><i></i></span>
+      <span class="dw dw-web"><b></b><i></i><i></i><i></i></span>
+    </div>
+    <div class="hero-frame">
+      <div class="hero-sel" data-hero-sel>
+        <span class="rd" data-readout aria-hidden="true"></span>
+        <div class="hero-brand" aria-hidden="true"><svg class="logo"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></div>
+        <p class="status">Early preview · not stable yet</p>
+        <h1 id="hero-h">Screenshots with annotations, built for GNOME on Wayland</h1>
+        <p class="lead">Knivchit freezes your screen, lets you draw a rounded selection, mark it up with arrows, text and mosaic, then copy, save or pin the result. Everything stays on your machine.</p>
+        <p class="meta">v0.1.0-alpha.1 does one thing: screenshots. Expect rough edges and breaking changes, and back up anything you care about. Tested on GNOME 50. Free and open source.</p>
+        <i class="hd nw"></i><i class="hd n"></i><i class="hd ne"></i><i class="hd e"></i>
+        <i class="hd se"></i><i class="hd s"></i><i class="hd sw"></i><i class="hd w"></i>
+      </div>
+      <div class="hero-pill">
+
+        <a class="btn btn-main" href="#install" aria-describedby="soon-note">Install</a>
+        <span class="soon-note" id="soon-note">Coming soon</span>
+
+
+        <span class="btn btn-ghost btn-off" aria-disabled="true">GitHub, public soon</span>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="sec see" aria-label="The Knivchit capture overlay: a rounded selection over the dimmed screen with an arrow, a rectangle and a mosaic area, and the annotation toolbar below.">
+    <figure class="slot slot-8x5" data-slot="overlay"><picture><source type="image/webp" srcset="/assets/img/overlay-640.webp 640w, /assets/img/overlay-1280.webp 1280w, /assets/img/overlay-1920.webp 1920w, /assets/img/overlay-2560.webp 2560w" sizes="(min-width: 1100px) 1100px, 100vw"><img src="/assets/img/overlay-1280.webp" width="2560" height="1600" alt="Interface preview of the Knivchit capture overlay: a rounded selection over a dimmed, simulated desktop with an arrow, a rectangle and a mosaic area, and the annotation toolbar below." loading="lazy" decoding="async"></picture><figcaption>Interface preview (rendered from the real interface over a simulated desktop): the capture overlay.</figcaption></figure>
+  </section>
+
+  <section class="sec how" id="how-it-works" aria-labelledby="how-h">
+    <header class="sec-head">
+      <h2 id="how-h">From screen to clipboard in three steps</h2>
+      <p>The capture happens on a frozen copy of your screen, so nothing moves while you choose.</p>
+    </header>
+    <div class="how-grid">
+      <div class="steps" role="tablist" aria-label="Steps of a capture" data-steps>
+
+        <button class="step" type="button" role="tab" id="tab-shortcut" aria-controls="stage-panel" aria-selected="true" tabindex="0" data-step="1">
+          <span class="step-n" aria-hidden="true">1</span>
+          <span class="step-t">Press your shortcut</span>
+          <span class="step-d">You pick the key combination in Settings; Knivchit doesn't assign any. The screen freezes and dims.</span>
+        </button>
+
+        <button class="step" type="button" role="tab" id="tab-annotate" aria-controls="stage-panel" aria-selected="false" tabindex="-1" data-step="2">
+          <span class="step-n" aria-hidden="true">2</span>
+          <span class="step-t">Select and annotate</span>
+          <span class="step-d">Drag a box, adjust it with the handles and mark what matters from the toolbar.</span>
+        </button>
+
+        <button class="step" type="button" role="tab" id="tab-output" aria-controls="stage-panel" aria-selected="false" tabindex="-1" data-step="3">
+          <span class="step-n" aria-hidden="true">3</span>
+          <span class="step-t">Copy, save or pin</span>
+          <span class="step-d">Copy the image, save it to your folder, or leave it floating on screen while you work.</span>
+        </button>
+
+      </div>
+      <div id="stage-panel" role="tabpanel" aria-labelledby="tab-shortcut" class="stage-panel">
+        <div class="stage" id="stage" data-step="1">
+  <div class="stage-screen" role="img" aria-label="Diagram of the second step: the selection with an arrow, a rectangle and a mosaic area, and the toolbar below." data-alts="Diagram of the first step: the dimmed screen with a rounded selection box and the hint to drag to select.||Diagram of the second step: the selection with an arrow, a rectangle and a mosaic area, and the toolbar below.||Diagram of the third step: the cropped capture floating over the desktop and a notice that it was saved and copied.">
+    <div class="desk" aria-hidden="true">
+      <span class="dw dw-code"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="dw dw-term"><i></i><i></i><i></i></span>
+      <span class="dw dw-web"><b></b><i></i><i></i><i></i></span>
+    </div>
+    <div class="dim" aria-hidden="true"></div>
+
+    <div class="sel sel-a" aria-hidden="true"><span class="rd">412 × 236</span></div>
+
+    <div class="sel sel-b" aria-hidden="true">
+      <span class="rd">660 × 330</span>
+      <div class="sel-clip"><div class="shot">
+  <div class="shot-win">
+    <div class="shot-bar"><i></i><i></i><i></i></div>
+    <span class="s-title"></span>
+    <span class="s-lbl l1"></span><span class="s-fld f1"></span>
+    <span class="s-lbl l2"></span><span class="s-fld f2"></span>
+    <span class="s-lbl l3"></span><span class="s-fld f3"></span>
+    <span class="s-btn"></span>
+  </div>
+  <span class="s-mosaic"></span>
+  <svg class="s-ann" viewBox="0 0 660 330" preserveAspectRatio="none" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="172" y="266" width="170" height="46" rx="14" stroke="var(--color-ann-amber)" stroke-width="5"/>
+    <path d="M590 60 512 148" stroke="var(--color-ann-red)" stroke-width="5" marker-end="url(#ah)"/>
+  </svg>
+</div>
+</div>
+      <i class="hd nw"></i><i class="hd n"></i><i class="hd ne"></i><i class="hd e"></i>
+      <i class="hd se"></i><i class="hd s"></i><i class="hd sw"></i><i class="hd w"></i>
+    </div>
+
+    <div class="hint" aria-hidden="true"><span>Drag to select · Esc to cancel</span></div>
+    <div class="bar-wrap" aria-hidden="true"><div class="pill-bar" data-pill>
+  <span class="pb"><svg class="g"><use href="#i-select"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-rect"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-ellipse"/></svg></span>
+  <span class="pb on"><svg class="g"><use href="#i-arrow"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-pen"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-text"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-mosaic"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-eraser"/></svg></span>
+  <span class="pd"></span>
+  <span class="pb"><svg class="g"><use href="#i-undo"/></svg></span>
+  <span class="pb off"><svg class="g"><use href="#i-redo"/></svg></span>
+  <span class="pd"></span>
+  <span class="pb off"><svg class="g"><use href="#i-ocr"/></svg></span>
+  <span class="pb off"><svg class="g"><use href="#i-translate"/></svg></span>
+  <span class="pb off"><svg class="g"><use href="#i-qr"/></svg></span>
+  <span class="pd"></span>
+  <span class="pb"><svg class="g"><use href="#i-pin"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-save"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-saveas"/></svg></span>
+  <span class="pb"><svg class="g"><use href="#i-cancel"/></svg></span>
+  <span class="pb ok"><svg class="g"><use href="#i-confirm"/></svg></span>
+</div>
+</div>
+
+    <div class="pin" aria-hidden="true"><div class="shot">
+  <div class="shot-win">
+    <div class="shot-bar"><i></i><i></i><i></i></div>
+    <span class="s-title"></span>
+    <span class="s-lbl l1"></span><span class="s-fld f1"></span>
+    <span class="s-lbl l2"></span><span class="s-fld f2"></span>
+    <span class="s-lbl l3"></span><span class="s-fld f3"></span>
+    <span class="s-btn"></span>
+  </div>
+  <span class="s-mosaic"></span>
+  <svg class="s-ann" viewBox="0 0 660 330" preserveAspectRatio="none" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="172" y="266" width="170" height="46" rx="14" stroke="var(--color-ann-amber)" stroke-width="5"/>
+    <path d="M590 60 512 148" stroke="var(--color-ann-red)" stroke-width="5" marker-end="url(#ah)"/>
+  </svg>
+</div>
+</div>
+    <div class="toast" aria-hidden="true"><svg class="g"><use href="#i-check"/></svg>Saved and copied to the clipboard</div>
+    <span class="mock-tag">Diagram</span>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="sec tools" id="tools" aria-labelledby="tools-h">
+    <header class="sec-head">
+      <h2 id="tools-h">Eight tools, each with its own cursor</h2>
+      <p>Pick them from the toolbar or the keyboard: <kbd>Alt</kbd> plus the letter always works, even while you type text; the bare letter works when you aren't typing.</p>
+    </header>
+    <ul class="toolist">
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-select"/></svg></span>
+        <div><h3>Select</h3><p>Touch a shape to move or resize it.</p></div>
+        <span class="tk">Alt+H · H · V</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-rect"/></svg></span>
+        <div><h3>Rectangle</h3><p>Frame a button, a paragraph or an error.</p></div>
+        <span class="tk">Alt+R · R</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-ellipse"/></svg></span>
+        <div><h3>Ellipse</h3><p>Circle what you want to point out.</p></div>
+        <span class="tk">Alt+O · O</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-arrow"/></svg></span>
+        <div><h3>Arrow</h3><p>Point at an exact spot in the image.</p></div>
+        <span class="tk">Alt+F · F</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-pen"/></svg></span>
+        <div><h3>Pen</h3><p>Freehand strokes, to underline or cross out.</p></div>
+        <span class="tk">Alt+L · L</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-text"/></svg></span>
+        <div><h3>Text</h3><p>Type a note straight onto the capture. Editable afterwards, with alignment.</p></div>
+        <span class="tk">Alt+T · T</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-mosaic"/></svg></span>
+        <div><h3>Mosaic</h3><p>Paint over what shouldn't be seen: passwords, names, addresses.</p></div>
+        <span class="tk">Alt+M · M</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-eraser"/></svg></span>
+        <div><h3>Eraser</h3><p>Remove a drawn shape you don't want to keep.</p></div>
+        <span class="tk">Alt+B · B</span>
+      </li>
+
+    </ul>
+    <p class="fine">Six annotation colors. Keys are matched by physical position, so they work on any keyboard layout. The letters follow the Spanish tool names for now, because the interface is in Spanish.</p>
+  </section>
+
+  <section class="sec edit" id="editing" aria-labelledby="edit-h">
+    <header class="sec-head">
+      <h2 id="edit-h">Mistakes are cheap</h2>
+      <p>What you draw stays editable until you finish the capture.</p>
+    </header>
+    <div class="edit-grid">
+      <dl class="points">
+        <div><dt>Move and resize</dt><dd>With Select you drag any shape and resize it from its corners, or move one end of an arrow. The capture selection itself also moves and resizes with eight handles.</dd></div><div><dt>Undo and redo</dt><dd><kbd>Ctrl</kbd> <kbd>Z</kbd> undoes the last stroke and <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd> brings it back.</dd></div><div><dt>Mosaic as a brush</dt><dd>Mosaic is painted like a thick stroke, not a box, so you cover only what you need to hide.</dd></div><div><dt>Native resolution</dt><dd>The crop and the annotations are composed at your screen's real resolution, not the preview's.</dd></div>
+      </dl>
+      <div class="outs">
+        <h3>When you finish</h3>
+        <ul>
+          <li><span>Copy and close</span><span class="tk">Enter · Ctrl+C</span></li><li><span>Save to your folder</span><span class="tk">Ctrl+S</span></li><li><span>Save as…</span><span class="tk">Ctrl+Shift+S</span></li><li><span>Pin on screen</span><span class="tk">Toolbar</span></li><li><span>Cancel</span><span class="tk">Esc</span></li>
+        </ul>
+        <p class="fine">A pinned capture is a borderless window you can drag. Keeping it above other windows needs the GNOME Shell extension to be active.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec why" id="why" aria-labelledby="why-h">
+    <header class="sec-head">
+      <h2 id="why-h">Why another screenshot tool</h2>
+      <p>On Wayland, GNOME decides what an application may do. Knivchit is built around that instead of fighting it.</p>
+    </header>
+    <dl class="points points-3">
+      <div><dt>Made for modern GNOME</dt><dd>On Wayland a regular app can't register global shortcuts, place its own window or stay above others. A small GNOME Shell extension does exactly that and nothing else; the app does the rest.</dd></div><div><dt>Careful design</dt><dd>A rounded selection, matching dark and light themes, and motion that respects your reduced-motion setting. The page you're reading uses the same tokens as the app.</dd></div><div><dt>Predictable</dt><dd>It captures once and works on that image, so what ends up in the file is what you saw when you pressed the shortcut.</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec settings" id="settings" aria-labelledby="settings-h">
+    <header class="sec-head">
+      <h2 id="settings-h">Shortcuts are yours to choose</h2>
+      <p>Knivchit ships with no global shortcut. You record one in Settings and it warns you if it clashes with a GNOME one. The main window is a narrow column on the right of the screen; the extension places it, because on Wayland an app can't position its own window.</p>
+    </header>
+    <dl class="points points-3">
+      <div><dt>Record any combination</dt><dd>Press the keys you want while recording. The result is applied through the extension, so it works across GNOME.</dd></div><div><dt>Dark, light or system</dt><dd>The app follows GNOME's preference or the one you set. This page does the same.</dd></div><div><dt>Your save folder</dt><dd>Choose where captures land (the default is a Knivchit folder inside Pictures) and open it from Home. Launching at login is optional and off by default.</dd></div>
+    </dl>
+    <div class="shots-row">
+      <figure class="slot slot-2x3" data-slot="hub"><picture><source type="image/webp" srcset="/assets/img/hub-360.webp 360w, /assets/img/hub-720.webp 720w" sizes="340px"><img src="/assets/img/hub-360.webp" width="720" height="1080" alt="Interface preview of the Knivchit main window: a narrow column with the sidebar, the capture card and the global shortcut status." loading="lazy" decoding="async"></picture><figcaption>Interface preview (rendered from the real interface): the main window.</figcaption></figure>
+      <figure class="slot slot-3x2" data-slot="shortcuts"><picture><source type="image/webp" srcset="/assets/img/shortcuts-480.webp 480w, /assets/img/shortcuts-960.webp 960w" sizes="(min-width: 900px) 520px, 100vw"><img src="/assets/img/shortcuts-480.webp" width="960" height="650" alt="Interface preview of the shortcuts card in Knivchit's settings, with the capture shortcut recorded." loading="lazy" decoding="async"></picture><figcaption>Interface preview (rendered from the real interface): recording a shortcut in Settings.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="sec privacy" id="privacy" aria-labelledby="priv-h">
+    <header class="sec-head">
+      <h2 id="priv-h">Your screen stays on your machine</h2>
+      <p>Knivchit has no server, no accounts and no cloud. What you capture goes to the folder you choose or to the clipboard, and nowhere else.</p>
+    </header>
+    <ul class="priv-list">
+      <li><h3>No accounts, no telemetry</h3><p>There is no sign-up and no usage statistics are sent. This page has no analytics or cookies either.</p></li><li><h3>No network unless you ask</h3><p>The app's only connection is “Check for updates” in About, and only when you click it. The extension never uses the network.</p></li><li><h3>The extension does the minimum</h3><p>It registers the shortcut you chose, keeps pinned windows on top and places the main window. It doesn't read the clipboard or what you type.</p></li><li><h3>The keyboard, only while recording a shortcut</h3><p>While you record a combination the extension grabs the keyboard for a few seconds to read it. Only the final combination is used, and the grab is always released: when done, on Esc, on a click or on timeout.</p></li><li><h3>Clipboard history will be off by default</h3><p>It doesn't exist yet. When it arrives it will be opt-in, and its contents will never be written to logs.</p></li>
+    </ul>
+    <p class="fine">The app is MIT licensed and the GNOME Shell extension is GPL-3.0-or-later.</p>
+  </section>
+
+  <section class="sec soon" id="soon" aria-labelledby="soon-h">
+    <header class="sec-head">
+      <h2 id="soon-h">From screenshot tool to digital Swiss Army knife</h2>
+      <p>Today Knivchit does one thing: screenshots. The plan is to bring together what currently takes several separate tools. None of the following exists yet, and there are no dates.</p>
+    </header>
+    <div class="road-grid">
+    <ul class="road">
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-clip"/></svg></span>
+        <div><h3>Clipboard history</h3><p>Get back what you copied earlier, search it and paste it again.</p></div>
+        <span class="badge">Coming soon</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-ocr"/></svg></span>
+        <div><h3>Text from the screen (OCR)</h3><p>Extract the text from any area of the screen instead of retyping it.</p></div>
+        <span class="badge">Coming soon</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-translate"/></svg></span>
+        <div><h3>Translation</h3><p>Translate that text without leaving what you're doing.</p></div>
+        <span class="badge">Coming soon</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-emoji"/></svg></span>
+        <div><h3>Emoji panel</h3><p>A quick picker to insert emoji.</p></div>
+        <span class="badge">Coming soon</span>
+      </li>
+
+      <li>
+        <span class="ti" aria-hidden="true"><svg class="g"><use href="#i-sticker"/></svg></span>
+        <div><h3>Stickers</h3><p>Browse and insert stickers from the same panel.</p></div>
+        <span class="badge">Coming soon</span>
+      </li>
+
+    </ul>
+    <div class="road-visual" aria-hidden="true">
+      <div class="pill-bar"><span class="pb off"><svg class="g"><use href="#i-ocr"/></svg></span><span class="pb off"><svg class="g"><use href="#i-translate"/></svg></span><span class="pb off"><svg class="g"><use href="#i-qr"/></svg></span></div>
+      <p>The capture toolbar already reserves their place, disabled.</p>
+    </div>
+    </div>
+  </section>
+
+  <section class="sec install" id="install" aria-labelledby="inst-h">
+    <header class="sec-head">
+      <h2 id="inst-h">Install</h2>
+      <p>Two pieces: the app (an AppImage) and a GNOME Shell extension.</p>
+    </header>
+    <p class="alpha-strip"><strong>Early preview, not stable yet.</strong> Expect rough edges and breaking changes, and back up anything you care about.</p>
+    <div class="inst-cols">
+      <section class="inst-col" aria-labelledby="inst-req-h">
+        <h3 id="inst-req-h">Requirements</h3>
+        <ul class="plain"><li>GNOME on Wayland (tested on 50).</li><li>Xwayland (on by default in Fedora and Ubuntu).</li><li><code>fuse3</code>, or <code>--appimage-extract-and-run</code>.</li><li><code>curl</code>, <code>python3</code>, <code>sha256sum</code> (for the script).</li></ul>
+        <p class="fine">The app's interface is in Spanish for now (English planned).</p>
+      </section>
+      <section class="inst-col" aria-labelledby="inst-script-h">
+        <h3 id="inst-script-h">With the script</h3>
+        <p class="state">No release published yet. These commands apply from the first release.</p>
+        <p>Downloads the latest release (a pre-release while no stable one exists), verifies the checksums and installs the app and the extension.</p>
+        <div class="cmd">
+          <pre class="code" tabindex="0" aria-label="Install command"><code id="cmd-script">curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/kevincharp/knivchit/main/install.sh -o install.sh &amp;&amp; less install.sh &amp;&amp; bash install.sh</code></pre>
+          <button class="copy" type="button" data-copy="cmd-script" data-copied="Copied" data-failed="Select and copy manually" aria-label="Copy the install command">Copy</button>
+          <span class="vh" role="status" data-copy-status></span>
+        </div>
+        <p class="fine">Opens the script in <code>less</code> first; press <code>q</code> to continue. <code>--stable</code> requires a stable version; <code>--version v0.1.0-alpha.1</code> pins one.</p>
+        <p class="fine">It prints “installing PRE-RELEASE …” first. When done, log out and back in once, then assign your shortcut in Settings.</p>
+      </section>
+      <section class="inst-col" aria-labelledby="inst-hand-h">
+        <h3 id="inst-hand-h">By hand</h3>
+        <ol class="inst-steps">
+
+          <li>
+            <h4>Download</h4>
+            <p>AppImage, extension zip and <code>SHA256SUMS</code> from the release page.</p>
+
+          </li>
+
+          <li>
+            <h4>Check the sums</h4>
+
+            <pre class="code" tabindex="0"><code>sha256sum -c SHA256SUMS --ignore-missing</code></pre>
+          </li>
+
+          <li>
+            <h4>Install the extension</h4>
+
+            <pre class="code" tabindex="0"><code>gnome-extensions install --force knivchit-extension-*.zip
+gnome-extensions enable knivchit@knivchit.dev</code></pre>
+          </li>
+
+          <li>
+            <h4>Run the app</h4>
+            <p>Run it, log out and back in once, then assign your shortcut in Settings.</p>
+            <pre class="code" tabindex="0"><code>chmod +x knivchit*.AppImage</code></pre>
+          </li>
+
+        </ol>
+      </section>
+    </div>
+  </section>
+
+  <section class="sec faq" id="faq" aria-labelledby="faq-h">
+    <header class="sec-head"><h2 id="faq-h">Frequently asked questions</h2></header>
+    <div class="faq-cols">
+
+      <div class="faq-col">
+
+        <details>
+          <summary>Is it stable?</summary>
+          <p>No. Knivchit is an early preview (alpha). There are no compatibility guarantees between versions: settings and data may be migrated or reset, and things can break. Back up anything you care about, and report problems through issues. While no stable release exists, the installer picks the latest pre-release (<code>--stable</code> refuses that).</p>
+        </details>
+
+        <details>
+          <summary>Does it work on KDE, X11 or other desktops?</summary>
+          <p>Knivchit is designed and tested for GNOME on Wayland only. Other desktops and X11 sessions are untested, and nothing is promised there.</p>
+        </details>
+
+        <details>
+          <summary>Which GNOME versions are supported?</summary>
+          <p>Tested on GNOME 50 on Wayland. The extension declares support for 50 only; widening that means testing each version first.</p>
+        </details>
+
+        <details>
+          <summary>Why does it need a GNOME Shell extension?</summary>
+          <p>On GNOME with Wayland an app can't register global shortcuts, place its window or keep another one on top. Only GNOME Shell can, and the extension is limited to exactly that.</p>
+        </details>
+
+        <details>
+          <summary>Is it safe? What can it access?</summary>
+          <p>The app has no server and makes no network requests except “Check for updates”, when you click it. The extension doesn't use the network or read the clipboard, and it grabs the keyboard only while you record a shortcut. The installer verifies SHA-256 sums before installing anything. Both the app and the extension are open source.</p>
+        </details>
+
+        <details>
+          <summary>Where are captures saved?</summary>
+          <p>In the folder you pick in Settings. The default is a <code>Knivchit</code> folder inside your Pictures directory. Copying to the clipboard doesn't write a file.</p>
+        </details>
+
+      </div>
+
+      <div class="faq-col">
+
+        <details>
+          <summary>How do I uninstall it?</summary>
+          <p>Run <code>bash install.sh --uninstall</code>. It removes the app, the service, launch-at-login and the extension. Your captures stay where they are.</p>
+        </details>
+
+        <details>
+          <summary>Why is the interface in Spanish?</summary>
+          <p>The project started in Spanish and the app has not been translated yet. An English interface is planned; there is no date.</p>
+        </details>
+
+        <details>
+          <summary>How do I report a bug or suggest an idea?</summary>
+          <p>Open an issue with the bug or feature template. Knivchit is issues-first: the maintainer handles issues, and pull requests are only accepted for an issue that was approved first, or for very small fixes.</p>
+        </details>
+
+        <details>
+          <summary>What license is it under?</summary>
+          <p>The app is MIT; the GNOME Shell extension is GPL-3.0-or-later; the site and docs are MIT.</p>
+        </details>
+
+        <details>
+          <summary>Where is the code?</summary>
+          <p>The repository isn't public yet. When it is, the link will appear on this page.</p>
+        </details>
+
+        <details>
+          <summary>Will there be clipboard history, OCR or emoji?</summary>
+          <p>That's the intention, which is why they appear under “Coming soon”. Today they don't exist and there's no date.</p>
+        </details>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section class="sec contribute" id="contribute" aria-labelledby="contrib-h">
+    <header class="sec-head">
+      <h2 id="contrib-h">Contributing</h2>
+      <p>Knivchit is issues-first and has a single maintainer with limited time.</p>
+    </header>
+    <dl class="points points-3">
+      <div><dt>Open an issue</dt><dd>The normal way to help is to open an issue with the bug or feature template. The maintainer fixes it.</dd></div><div><dt>Pull requests, by invitation</dt><dd>A PR is accepted only against an issue the maintainer has approved, or for a very small, self-contained fix such as a typo. Larger PRs without an approved issue are closed unreviewed, and there's no promise of a fast review.</dd></div><div><dt>Security problems</dt><dd>Report vulnerabilities privately through GitHub's private vulnerability reporting, never in a public issue.</dd></div>
+    </dl>
+
+  </section>
+</main>
+
+<footer class="foot" aria-label="Footer">
+  <div class="foot-brand"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></div>
+  <p>Knivchit v0.1.0-alpha.1, early preview. Free, open source and without tracking.</p>
+  <p>The app is MIT; the GNOME Shell extension is GPL-3.0-or-later.</p>
+  <p><span class="soon-text">GitHub, public soon</span></p>
+  <p>Created by <a href="https://github.com/kevincharp" rel="noopener">Kevin Charpentier</a>.</p>
+  <p class="fine">No cookies, no analytics, no third-party services.</p>
+  <p class="legal">Typefaces: <a href="/assets/fonts/LICENSE-Inter.txt">Inter</a> and <a href="/assets/fonts/LICENSE-Bricolage-Grotesque.txt">Bricolage Grotesque</a>, SIL OFL 1.1, hosted on this site.</p>
+</footer>
+
+<script src="/assets/js/main.js" defer></script>
+</body>
+</html>

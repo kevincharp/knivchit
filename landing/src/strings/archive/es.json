@@ -1,0 +1,440 @@
+{
+  "_nota": "Todos los textos visibles del sitio. Se inserta tal cual (HTML de confianza): solo <kbd>, <code>, <strong>, <em> y <a>. Para añadir un idioma, copia este archivo como en.json y traduce los valores.",
+  "meta": {
+    "lang": "es",
+    "title": "Knivchit: captura de pantalla con anotaciones para GNOME",
+    "description": "Capturador de pantalla para GNOME en Wayland: selección redondeada, anotaciones, mosaico, copiar, guardar o fijar. Local, sin cuentas y sin telemetría.",
+    "ogTitle": "Knivchit, el capturador de pantalla para GNOME",
+    "ogDescription": "Selecciona, anota y fija tu pantalla en GNOME sobre Wayland. Local, sin cuentas y sin telemetría.",
+    "ogImageAlt": "Logotipo de Knivchit, un cuchillo con la hoja azul y el mango de madera, sobre un fondo azul marino",
+    "locale": "es_ES",
+    "themeColorDark": "#0a0e1a",
+    "themeColorLight": "#f4f6fb"
+  },
+  "ui": {
+    "skip": "Saltar al contenido",
+    "brand": "Knivchit",
+    "homeAria": "Knivchit, inicio",
+    "navAria": "Principal",
+    "footerAria": "Pie de página",
+    "theme": {
+      "label": "Tema",
+      "system": "Sistema",
+      "dark": "Oscuro",
+      "light": "Claro"
+    },
+    "soon": "Pronto",
+    "available": "Disponible",
+    "mockLabel": "Ilustración"
+  },
+  "nav": [
+    {
+      "href": "#como-funciona",
+      "label": "Cómo funciona"
+    },
+    {
+      "href": "#herramientas",
+      "label": "Herramientas"
+    },
+    {
+      "href": "#privacidad",
+      "label": "Privacidad"
+    },
+    {
+      "href": "#pronto",
+      "label": "Lo que viene"
+    },
+    {
+      "href": "#instalar",
+      "label": "Instalar"
+    }
+  ],
+  "actions": {
+    "install": "Instalar",
+    "installSoon": "Disponible próximamente",
+    "repo": "Código fuente",
+    "repoSoon": "Repositorio público próximamente",
+    "how": "Ver cómo funciona"
+  },
+  "hero": {
+    "h1": "Captura tu pantalla y anótala en el mismo sitio",
+    "sub": "Knivchit es un capturador para GNOME sobre Wayland. Dibujas la selección, marcas lo importante encima y copias, guardas o fijas la imagen. Todo ocurre en tu equipo.",
+    "meta": "Probado en GNOME 50 (Wayland). Gratuito y de código abierto.",
+    "sizeLabel": "Tamaño de la selección",
+    "selectionAria": "Presentación de Knivchit"
+  },
+  "how": {
+    "id": "como-funciona",
+    "h2": "De la pantalla al portapapeles en tres gestos",
+    "intro": "La captura se hace sobre una foto congelada de tu pantalla, así que nada se mueve mientras eliges.",
+    "tabsAria": "Pasos de una captura",
+    "steps": [
+      {
+        "id": "atajo",
+        "title": "Pulsa tu atajo",
+        "text": "Eliges la combinación de teclas en Configuración; Knivchit no impone ninguna. La pantalla se congela y se atenúa."
+      },
+      {
+        "id": "anota",
+        "title": "Selecciona y anota",
+        "text": "Dibuja el recuadro, ajústalo con las manijas y marca lo importante con la barra de herramientas."
+      },
+      {
+        "id": "sale",
+        "title": "Copia, guarda o fija",
+        "text": "Copias la imagen, la guardas en tu carpeta o la dejas flotando en pantalla mientras trabajas."
+      }
+    ],
+    "stage": {
+      "alt1": "Ilustración del primer paso: la pantalla atenuada con un recuadro de selección redondeado y el aviso «Arrastra para seleccionar».",
+      "alt2": "Ilustración del segundo paso: la selección con una flecha, un rectángulo y una zona en mosaico, y debajo la barra de herramientas.",
+      "alt3": "Ilustración del tercer paso: la captura recortada flotando sobre el escritorio y el aviso de que se guardó y se copió.",
+      "hint": "Arrastra para seleccionar · Esc para cancelar",
+      "toast": "Guardada y copiada al portapapeles"
+    }
+  },
+  "tools": {
+    "id": "herramientas",
+    "h2": "Ocho herramientas, cada una con su cursor",
+    "intro": "Se eligen en la barra o con el teclado: <kbd>Alt</kbd> más la letra funciona siempre, incluso mientras escribes un texto; la letra sola, cuando no estás escribiendo.",
+    "colors": "Anotas en seis colores. Las letras se reconocen por la tecla física, así que valen igual con cualquier distribución de teclado.",
+    "list": [
+      {
+        "icon": "select",
+        "name": "Seleccionar",
+        "keys": "Alt+H · H · V",
+        "text": "Toca una figura para moverla o cambiarle el tamaño."
+      },
+      {
+        "icon": "rect",
+        "name": "Rectángulo",
+        "keys": "Alt+R · R",
+        "text": "Enmarca un botón, un párrafo o un error."
+      },
+      {
+        "icon": "ellipse",
+        "name": "Elipse",
+        "keys": "Alt+O · O",
+        "text": "Rodea lo que quieres destacar."
+      },
+      {
+        "icon": "arrow",
+        "name": "Flecha",
+        "keys": "Alt+F · F",
+        "text": "Señala un punto exacto de la imagen."
+      },
+      {
+        "icon": "pen",
+        "name": "Lápiz",
+        "keys": "Alt+L · L",
+        "text": "Trazo libre, para subrayar o tachar a mano."
+      },
+      {
+        "icon": "text",
+        "name": "Texto",
+        "keys": "Alt+T · T",
+        "text": "Escribe una nota directamente sobre la captura."
+      },
+      {
+        "icon": "mosaic",
+        "name": "Mosaico",
+        "keys": "Alt+M · M",
+        "text": "Pinta encima de lo que no debe verse: contraseñas, nombres, direcciones."
+      },
+      {
+        "icon": "eraser",
+        "name": "Borrador",
+        "keys": "Alt+B · B",
+        "text": "Borra lo dibujado que no quieres conservar."
+      }
+    ]
+  },
+  "edit": {
+    "id": "edicion",
+    "h2": "Equivocarse sale barato",
+    "intro": "Lo que dibujas sigue siendo editable hasta que terminas la captura.",
+    "points": [
+      {
+        "title": "Mover y reajustar",
+        "text": "Con Seleccionar arrastras cualquier figura y cambias su tamaño desde las esquinas, o mueves un extremo de la flecha. La selección de la captura también se puede mover y redimensionar con ocho manijas."
+      },
+      {
+        "title": "Deshacer y rehacer",
+        "text": "<kbd>Ctrl</kbd> <kbd>Z</kbd> deshace el último trazo y <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd> lo recupera."
+      },
+      {
+        "title": "Mosaico como pincel",
+        "text": "El mosaico se pinta como un trazo grueso, no como un recuadro: cubres solo lo que necesitas ocultar."
+      },
+      {
+        "title": "Resolución nativa",
+        "text": "El recorte y las anotaciones se componen a la resolución real de tu pantalla, no a la de la vista previa."
+      }
+    ],
+    "outputsTitle": "Al terminar",
+    "outputs": [
+      {
+        "keys": "Enter · Ctrl+C",
+        "text": "Copiar y cerrar"
+      },
+      {
+        "keys": "Ctrl+S",
+        "text": "Guardar en tu carpeta"
+      },
+      {
+        "keys": "Ctrl+Shift+S",
+        "text": "Guardar como…"
+      },
+      {
+        "keys": "Barra",
+        "text": "Fijar en pantalla"
+      },
+      {
+        "keys": "Esc",
+        "text": "Cancelar"
+      }
+    ],
+    "pinNote": "Una captura fijada queda en una ventana sin marco que puedes arrastrar. Para que se mantenga por encima de las demás ventanas hace falta la extensión de GNOME Shell activa."
+  },
+  "hub": {
+    "id": "ventana",
+    "h2": "Una ventana principal que se queda a un lado",
+    "intro": "Es una columna estrecha, a la derecha de la pantalla, con lo necesario para configurar Knivchit y lanzar una captura sin atajo. La colocación la hace la extensión: bajo Wayland una aplicación no puede posicionar su propia ventana.",
+    "points": [
+      {
+        "title": "Atajos a tu manera",
+        "text": "Knivchit no trae ningún atajo asignado. Lo grabas tú en Configuración y avisa si choca con uno de GNOME."
+      },
+      {
+        "title": "Oscuro, claro o el del sistema",
+        "text": "Sigue la preferencia de GNOME o la fijas tú. Esta página hace lo mismo."
+      },
+      {
+        "title": "Tu carpeta de guardado",
+        "text": "Eliges dónde caen las capturas y la abres desde Inicio. Iniciar con la sesión es opcional y viene desactivado."
+      }
+    ],
+    "windowTitle": "Knivchit",
+    "windowAlt": "Ilustración de la ventana principal de Knivchit: barra lateral con Inicio, Captura, Texto en pantalla, Portapapeles, Emojis y stickers, Configuración y Acerca de; a la derecha, la tarjeta del capturador y el estado del atajo global.",
+    "sidebar": [
+      {
+        "icon": "home",
+        "label": "Inicio",
+        "current": true
+      },
+      {
+        "icon": "capture",
+        "label": "Captura"
+      },
+      {
+        "icon": "ocr",
+        "label": "Texto en pantalla",
+        "soon": true
+      },
+      {
+        "icon": "clip",
+        "label": "Portapapeles",
+        "soon": true
+      },
+      {
+        "icon": "emoji",
+        "label": "Emojis y stickers",
+        "soon": true
+      }
+    ],
+    "sidebarFoot": [
+      {
+        "icon": "gear",
+        "label": "Configuración"
+      },
+      {
+        "icon": "info",
+        "label": "Acerca de"
+      }
+    ],
+    "card": {
+      "title": "Captura de pantalla",
+      "text": "Elige una zona, anótala y cópiala o guárdala.",
+      "button": "Capturar",
+      "shortcutLabel": "Atajo",
+      "shortcutValue": "el que tú asignes",
+      "statusTitle": "Atajo global",
+      "statusValue": "Activo",
+      "folderTitle": "Carpeta de guardado",
+      "folderValue": "~/Imágenes/Capturas"
+    }
+  },
+  "privacy": {
+    "id": "privacidad",
+    "h2": "Tu pantalla se queda en tu equipo",
+    "intro": "Knivchit no tiene servidor, cuentas ni panel en la nube. Lo que capturas lo guarda en la carpeta que eliges o lo copia al portapapeles, y nada más.",
+    "items": [
+      {
+        "title": "Sin cuentas ni telemetría",
+        "text": "No hay registro, no se envían estadísticas de uso y esta página tampoco usa analíticas ni cookies."
+      },
+      {
+        "title": "Sin red, salvo cuando tú lo pides",
+        "text": "La única conexión de la aplicación es «Buscar actualizaciones», en Acerca de, y solo cuando la pulsas. La extensión no usa la red."
+      },
+      {
+        "title": "La extensión hace lo mínimo",
+        "text": "Registra el atajo que eliges, mantiene encima las ventanas fijadas y coloca la ventana principal. No accede al portapapeles ni guarda lo que tecleas."
+      },
+      {
+        "title": "El teclado, solo al grabar un atajo",
+        "text": "Mientras grabas una combinación, la extensión captura el teclado unos segundos para leerla. Solo se usa la combinación final y el control se libera siempre: al terminar, con Esc, con un clic o al vencer el tiempo."
+      }
+    ],
+    "license": "La app tiene licencia MIT y la extensión de GNOME Shell, GPL-3.0 o posterior."
+  },
+  "soon": {
+    "id": "pronto",
+    "h2": "De capturador a navaja suiza",
+    "intro": "Hoy Knivchit hace una cosa: capturar. La idea es reunir en una sola instalación lo que ahora obliga a instalar programas por separado. Esto es lo que se plantea y todavía no existe; no hay fechas.",
+    "list": [
+      {
+        "icon": "clip",
+        "name": "Portapapeles con historial",
+        "text": "Recuperar lo que copiaste antes, buscarlo y pegarlo de nuevo."
+      },
+      {
+        "icon": "ocr",
+        "name": "Texto en pantalla",
+        "text": "Extraer el texto de cualquier zona de la pantalla, sin teclearlo."
+      },
+      {
+        "icon": "translate",
+        "name": "Traducción",
+        "text": "Traducir ese texto sin salir de lo que estás haciendo."
+      },
+      {
+        "icon": "emoji",
+        "name": "Emojis y stickers",
+        "text": "Un selector rápido para insertar emojis y stickers."
+      }
+    ],
+    "visual": "Los botones de la barra de captura ya reservan su sitio, desactivados."
+  },
+  "install": {
+    "id": "instalar",
+    "h2": "Instalar",
+    "intro": "Son dos piezas: la aplicación (un AppImage) y una extensión de GNOME Shell. Puedes instalarlas con el script que acompañará al lanzamiento o a mano.",
+    "reqTitle": "Requisitos",
+    "req": [
+      "GNOME sobre Wayland. Probado en GNOME 50.",
+      "Para el instalador: <code>curl</code>, <code>python3</code> y <code>sha256sum</code>. A mano solo hace falta <code>gnome-extensions</code>."
+    ],
+    "stepsTitle": "Pasos",
+    "soonNote": "Todavía no hay ninguna versión publicada, así que aún no hay nada que descargar. Estos son los pasos que seguirán al primer lanzamiento.",
+    "uninstallTitle": "Desinstalar",
+    "uninstall": "Ejecuta el instalador con <code>--uninstall</code>. Quita la aplicación, la extensión y sus datos; tus capturas y la base de datos de la aplicación no se borran.",
+    "uninstallCode": "./install.sh --uninstall",
+    "options": [
+      {
+        "title": "Con el instalador",
+        "intro": "<code>install.sh</code> será un archivo más del lanzamiento, junto al AppImage, el zip de la extensión y <code>SHA256SUMS</code>.",
+        "steps": [
+          {
+            "title": "Descarga install.sh y léelo",
+            "text": "Bájalo de la página del lanzamiento y revísalo antes de ejecutarlo; no lo encadenes a una descarga directa en la terminal.",
+            "code": "less install.sh"
+          },
+          {
+            "title": "Ejecútalo",
+            "text": "Descarga el AppImage y la extensión, comprueba su suma SHA-256 contra <code>SHA256SUMS</code> antes de tocar nada, y crea la entrada del menú de aplicaciones y la activación por D-Bus. Con el instalador, la primera pulsación del atajo arranca la app sola.",
+            "code": "bash install.sh"
+          },
+          {
+            "title": "Cierra sesión y vuelve a entrar",
+            "text": "En Wayland, GNOME Shell solo carga las extensiones nuevas al iniciar la sesión."
+          },
+          {
+            "title": "Asigna tu atajo",
+            "text": "Abre Knivchit, entra en Configuración, pulsa «Asignar» y pulsa la combinación que prefieras. Hasta entonces puedes capturar con el botón «Capturar» de la ventana principal."
+          }
+        ]
+      },
+      {
+        "title": "A mano",
+        "intro": "Los mismos archivos del lanzamiento, sin script.",
+        "steps": [
+          {
+            "title": "Descarga y comprueba",
+            "text": "Baja el AppImage, el zip de la extensión y <code>SHA256SUMS</code>, y verifica las sumas.",
+            "code": "sha256sum -c SHA256SUMS --ignore-missing"
+          },
+          {
+            "title": "Prepara el AppImage",
+            "text": "Hazlo ejecutable y guárdalo donde quieras. Sin el instalador no se crea la activación por D-Bus que arranca la app con el atajo, así que, o dejas Knivchit abierto, o activas «Iniciar con la sesión» en Configuración para que arranque oculto al entrar al escritorio.",
+            "code": "chmod +x knivchit*.AppImage"
+          },
+          {
+            "title": "Instala y activa la extensión",
+            "text": "",
+            "code": "gnome-extensions install --force knivchit-extension-*.zip\ngnome-extensions enable knivchit@knivchit.dev"
+          },
+          {
+            "title": "Cierra sesión y vuelve a entrar",
+            "text": "Hace falta para que GNOME Shell cargue la extensión."
+          },
+          {
+            "title": "Asigna tu atajo",
+            "text": "En Configuración de Knivchit, pulsa «Asignar» y elige la combinación."
+          }
+        ]
+      }
+    ]
+  },
+  "faq": {
+    "id": "preguntas",
+    "h2": "Preguntas frecuentes",
+    "list": [
+      {
+        "q": "¿Funciona en X11 o en otros escritorios?",
+        "a": "Knivchit está pensado y probado para GNOME sobre Wayland. En otros escritorios o sesiones no está probado, y no se promete que funcione."
+      },
+      {
+        "q": "¿Qué versiones de GNOME admite?",
+        "a": "Probado en GNOME 50 sobre Wayland. La extensión declara hoy compatibilidad solo con la 50; ampliarla exige probarla antes en cada versión."
+      },
+      {
+        "q": "¿Por qué hace falta una extensión?",
+        "a": "En GNOME sobre Wayland una aplicación no puede registrar atajos globales, colocar su ventana ni mantener otra encima de las demás. Eso solo puede hacerlo el propio GNOME Shell, y la extensión se limita a eso."
+      },
+      {
+        "q": "¿Qué datos recoge?",
+        "a": "Ninguno. No hay cuentas, analíticas ni telemetría. Las capturas se guardan en la carpeta que elijas."
+      },
+      {
+        "q": "¿Qué licencia tiene?",
+        "a": "La app, MIT; la extensión de GNOME Shell, GPL-3.0 o posterior."
+      },
+      {
+        "q": "¿Dónde está el código?",
+        "a": "El repositorio público todavía no existe. Cuando se publique, el enlace aparecerá en esta página.",
+        "repoLinked": "El código está en <a href=\"{{REPO_URL}}\" rel=\"noopener\">el repositorio público</a>."
+      },
+      {
+        "q": "¿Cómo lo desinstalo?",
+        "a": "Con <code>./install.sh --uninstall</code>. Quita la aplicación, el servicio, el arranque con la sesión y la extensión. Tus capturas se quedan donde están."
+      },
+      {
+        "q": "¿Habrá portapapeles, OCR o emojis?",
+        "a": "Es la intención y por eso están en «Lo que viene», pero hoy no existen y no hay fecha."
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "Knivchit v{{VERSION}}. Gratuito, de código abierto y sin rastreo.",
+    "licenses": "La app, MIT; la extensión de GNOME Shell, GPL-3.0 o posterior.",
+    "fonts": "Tipografías Inter y Bricolage Grotesque, con licencia SIL OFL 1.1, servidas desde este mismo sitio.",
+    "noTracking": "Sin cookies, sin analíticas y sin peticiones a terceros."
+  },
+  "notFound": {
+    "title": "Página no encontrada · Knivchit",
+    "h1": "Esta página no existe",
+    "text": "El enlace puede estar mal escrito o la página ya no está.",
+    "back": "Volver al inicio"
+  }
+}

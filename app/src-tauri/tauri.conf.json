@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "knivchit",
+	"version": "0.1.0-alpha.1",
+	"identifier": "org.knivchit.app",
+	"build": {
+		"beforeDevCommand": "pnpm dev",
+		"devUrl": "http://localhost:1420",
+		"beforeBuildCommand": "pnpm build",
+		"frontendDist": "../dist"
+	},
+	"app": {
+		"windows": [
+			{
+				"label": "main",
+				"create": false,
+				"title": "Knivchit",
+				"width": 480,
+				"height": 720,
+				"resizable": true,
+				"minWidth": 480,
+				"maxWidth": 480,
+				"minHeight": 480,
+				"maxHeight": 720,
+				"decorations": false,
+				"visible": false
+			}
+		],
+		"security": {
+			"csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'",
+			"devCsp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost ws://localhost:1420 http://localhost:1420; object-src 'none'; base-uri 'self'"
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"icon": [
+			"icons/16x16.png",
+			"icons/24x24.png",
+			"icons/32x32.png",
+			"icons/48x48.png",
+			"icons/64x64.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		]
+	}
+}

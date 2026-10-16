@@ -1,0 +1,34 @@
+name: Suggest a feature
+description: An idea to improve the project
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggesting here is the normal way: the maintainer decides and implements it. If you want to implement it yourself, wait for the issue to carry the `accepted` or `help-wanted` label before opening a PR.
+        Before suggesting, check the Status section of the README: clipboard history, OCR, translation and emoji are already on the roadmap as "Coming soon".
+        The project is local-only with no telemetry: proposals that need accounts, servers or network access don't fit.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem do you have
+      description: Describe it from your use, not from the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you propose
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you like to implement it?
+      options:
+        - Yes, once the issue is accepted
+        - No, I'm only suggesting it

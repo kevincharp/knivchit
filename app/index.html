@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/knivchit.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Knivchit</title>
+    <script>
+      // Aplica el tema antes del primer pintado, solo en la ventana principal
+      // (el overlay y el pin llevan ?window=). Misma lógica que lib/theme.ts.
+      // El overlay y el pin NO leen el tema guardado: su primer frame es un
+      // oscuro neutro fijo (el de --color-chrome en theme.css), no el blanco por
+      // defecto del webview, que se vería como un destello al abrirse la ventana.
+      try {
+        if (new URLSearchParams(location.search).has("window")) {
+          document.documentElement.style.background = "#05070d";
+          document.documentElement.style.colorScheme = "dark";
+        } else {
+          // La clave vieja (ViewClip) solo se lee si falta la nueva; lib/theme.ts la migra.
+          const c =
+            localStorage.getItem("knivchit-theme") ?? localStorage.getItem("viewclip-theme");
+          const dark =
+            c === "dark" ||
+            (c !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+        }
+      } catch {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

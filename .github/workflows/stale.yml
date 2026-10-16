@@ -1,0 +1,34 @@
+name: Stale
+
+"on":
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  cerrar:
+    runs-on: ubuntu-22.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      # Issues and PRs waiting for the author ("needs-info") are closed after 14 days
+      - name: Close those waiting for information
+        run: |
+          limite=$(date -u -d '14 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh issue list --repo "$REPO" --label needs-info --state open --limit 100 \
+            --json number,updatedAt --jq ".[] | select(.updatedAt < \"$limite\") | .number" |
+          while read -r n; do
+            gh issue close "$n" --repo "$REPO" --reason "not planned" \
+              --comment "Closed after 14 days without a reply. Reopen it with the requested information and we will pick it up."
+          done
+          gh pr list --repo "$REPO" --label needs-info --state open --limit 100 \
+            --json number,updatedAt --jq ".[] | select(.updatedAt < \"$limite\") | .number" |
+          while read -r n; do
+            gh pr close "$n" --repo "$REPO" \
+              --comment "Closed after 14 days of inactivity. You can reopen it when you update it."
+          done
