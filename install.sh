@@ -296,7 +296,7 @@ install_desktop_entry() {
 	cat >"$DESKTOP_PATH" <<EOF
 [Desktop Entry]
 Type=Application
-Version=1.5
+Version=1.0
 Name=Knivchit
 GenericName=Capturador de pantalla
 GenericName[en]=Screenshot tool
