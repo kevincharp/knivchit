@@ -1,22 +1,40 @@
 version: 2
+# Una sola PR agrupada por ecosistema y semana con las actualizaciones menores y de parche.
+# Las versiones mayores no se proponen solas: se estudian a mano (pueden romper la compilación).
 updates:
   - package-ecosystem: cargo
     directory: /app/src-tauri
     schedule:
       interval: weekly
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 1
     commit-message:
       prefix: "chore(deps)"
+    groups:
+      rust-minor-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /app
     schedule:
       interval: weekly
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 1
     commit-message:
       prefix: "chore(deps)"
+    groups:
+      js-minor-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
     commit-message:
       prefix: "ci"
+    groups:
+      actions-minor-patch:
+        update-types: ["minor", "patch"]
