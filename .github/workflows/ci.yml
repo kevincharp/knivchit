@@ -39,6 +39,13 @@ jobs:
       - name: Configurar toolchain de Rust
         uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
 
+      # Cache de dependencias compiladas: la primera ejecución compila Rust desde cero (~15 min);
+      # con cache las siguientes tardan una fracción.
+      - name: Cache de compilación de Rust
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: app/src-tauri
+
       - name: Instalar dependencias de sistema
         run: |
           sudo apt-get update
