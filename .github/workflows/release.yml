@@ -90,9 +90,18 @@ jobs:
       - name: Crear release en GitHub
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
+          # Se crea como BORRADOR y se publica al final: con "release immutability" activada en el
+          # repositorio, un release publicado ya no admite cambios en sus archivos ni en su etiqueta.
+          draft: true
           # Una etiqueta con sufijo (v0.1.0-alpha.1, -beta.1, -rc.1) se publica como pre-release
           prerelease: ${{ contains(github.ref_name, '-') }}
+          fail_on_unmatched_files: true
           files: |
             bundle/*.AppImage
             bundle/*.zip
             bundle/SHA256SUMS
+
+      - name: Publicar el release (ya con todos los archivos adjuntos)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" --draft=false
