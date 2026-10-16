@@ -38,3 +38,6 @@ updates:
     groups:
       actions-minor-patch:
         update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
