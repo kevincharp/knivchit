@@ -81,6 +81,24 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Descargar el código (solo para leer el CHANGELOG)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Extraer las notas de esta versión del CHANGELOG
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::CHANGELOG.md no tiene una sección para la versión ${version}"
+            exit 1
+          fi
+
       - name: Descargar artefactos
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
@@ -93,6 +111,7 @@ jobs:
           # Se crea como BORRADOR y se publica al final: con "release immutability" activada en el
           # repositorio, un release publicado ya no admite cambios en sus archivos ni en su etiqueta.
           draft: true
+          body_path: release-notes.md
           # Una etiqueta con sufijo (v0.1.0-alpha.1, -beta.1, -rc.1) se publica como pre-release
           prerelease: ${{ contains(github.ref_name, '-') }}
           fail_on_unmatched_files: true
