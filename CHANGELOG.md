@@ -4,10 +4,18 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.0-alpha.2]
+
+Fixes two problems found in the first real install of alpha.1. If you installed alpha.1, run `install.sh` again to update and then log out and back in.
+
 ### Fixed
 
 - **The dock no longer pops up when you press the capture shortcut.** The capture overlay was created without focus, Wayland flagged it as "needs attention", and docks such as Dash to Dock revealed themselves showing the Knivchit icon. The GNOME Shell extension now activates the overlay as soon as it appears. This needs the updated extension and a new login session.
 - **Blank window on distributions with a newer Mesa** (seen on Fedora 44, Mesa 26): the AppImage no longer bundles its own `libwayland-*`. The bundled WebKit mixed them with the system Mesa, its web process aborted with `Could not create default EGL display: EGL_BAD_PARAMETER`, and the window stayed empty. It now uses the system libraries.
+
+### Changed
+
+- Dependency updates (Tauri 2.12, `tauri-plugin-opener`, `tauri-plugin-sql`, `tokio`, `uuid`, Biome and other minor and patch releases) and `pnpm/action-setup` in the release workflow.
 
 ## [0.1.0-alpha.1]
 
@@ -50,5 +58,6 @@ Knivchit was called ViewClip during development; no public release was ever publ
 - **Install:** `install.sh` removes the old `viewclip@viewclip.dev` extension, desktop entry, autostart entry, D-Bus service, icons, binary and logs, keeping autostart under the new name. Log out and back in afterwards so GNOME loads the new extension.
 - Updating between Knivchit versions: run `install.sh` again (add `--version <tag>` to pin one).
 
-[Unreleased]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.1...HEAD
+[Unreleased]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.2...HEAD
+[0.1.0-alpha.2]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.1
