@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- **The default screenshots folder now follows your system language.** It used to be hardcoded to `~/Pictures/Screenshots`, so a Spanish system got a new English-named `Pictures` folder. The default is now GNOME's own screenshots folder inside your Pictures directory, with its translated name (for example `~/Imágenes/Capturas de pantalla`). If you already confirmed the old default, pick the folder again once in Settings.
 - **"Open folder" in Settings opened a web browser instead of the file manager.** Inside the AppImage the helper process inherited the AppImage's own library and search paths, `gio` failed and `xdg-open` fell back to `$BROWSER`. It now runs with the system's environment.
 
 ## [0.1.0-alpha.2]
