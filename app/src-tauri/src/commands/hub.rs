@@ -180,8 +180,58 @@ pub async fn open_save_dir(pool: State<'_, SqlitePool>) -> Result<(), String> {
         resolve_save_dir(super::output::SAVE_DIR_PLACEHOLDER)
     })?;
     // Mensaje fijo: ni la ruta ni el detalle del error salen del comando.
-    tauri_plugin_opener::open_path(&dir, None::<&str>)
-        .map_err(|_| "no se pudo abrir la carpeta de capturas".to_string())
+    open_in_file_manager(&dir).map_err(|_| "no se pudo abrir la carpeta de capturas".to_string())
+}
+
+/// Cambios al entorno para lanzar un programa DEL SISTEMA desde dentro de un AppImage.
+///
+/// El hook del AppImage antepone su montaje (`APPDIR`, p. ej. `/tmp/.mount_xxxx`) a `PATH`,
+/// `LD_LIBRARY_PATH`, `XDG_DATA_DIRS`, `GIO_MODULE_DIR`, `PYTHONHOME`… y un hijo que las hereda
+/// usa las librerías de Ubuntu 22.04 empaquetadas: `gio` falla, `xdg-open` cae a sus métodos
+/// genéricos y termina abriendo la carpeta en el navegador (`$BROWSER`). Devuelve, por variable,
+/// el valor sin las rutas del montaje (`Some`) o `None` si no queda nada y hay que quitarla.
+/// Solo cuentan componentes completos del montaje (`/tmp/.mount_x` no es `/tmp/.mount_xy`).
+/// Con `appdir` vacío (fuera de un AppImage) no cambia nada.
+pub fn host_env_changes(
+    appdir: &str,
+    vars: impl IntoIterator<Item = (String, String)>,
+) -> Vec<(String, Option<String>)> {
+    if appdir.is_empty() {
+        return Vec::new();
+    }
+    let inside = |entry: &str| {
+        entry == appdir
+            || entry.strip_prefix(appdir).is_some_and(|rest| rest.starts_with('/'))
+    };
+    vars.into_iter()
+        .filter_map(|(key, value)| {
+            if !value.split(':').any(inside) {
+                return None;
+            }
+            let kept: Vec<&str> = value.split(':').filter(|e| !e.is_empty() && !inside(e)).collect();
+            Some((key, (!kept.is_empty()).then(|| kept.join(":"))))
+        })
+        .collect()
+}
+
+/// Abre `dir` con el programa por defecto del sistema (`xdg-open`) con el entorno del sistema, no
+/// el del AppImage (ver `host_env_changes`). No espera a que termine, pero recoge al hijo.
+fn open_in_file_manager(dir: &Path) -> std::io::Result<()> {
+    let mut cmd = std::process::Command::new("xdg-open");
+    cmd.arg(dir);
+    if let Some(appdir) = std::env::var("APPDIR").ok().filter(|v| !v.is_empty()) {
+        for (key, value) in host_env_changes(&appdir, std::env::vars()) {
+            match value {
+                Some(value) => cmd.env(key, value),
+                None => cmd.env_remove(key),
+            };
+        }
+    }
+    let mut child = cmd.spawn()?;
+    std::thread::spawn(move || {
+        let _ = child.wait();
+    });
+    Ok(())
 }
 
 fn system_autostart_dir() -> Result<PathBuf, String> {
@@ -340,5 +390,59 @@ mod tests {
         assert_eq!(got, target);
         assert!(target.is_dir());
         let _ = std::fs::remove_dir_all(&base);
+    }
+
+    fn env(pairs: &[(&str, &str)]) -> Vec<(String, String)> {
+        pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+    }
+
+    #[test]
+    fn host_env_changes_strips_the_appimage_mount_from_search_paths() {
+        let vars = env(&[
+            ("PATH", "/tmp/.mount_x/usr/bin/:/tmp/.mount_x/bin/:/usr/local/bin:/usr/bin"),
+            ("XDG_DATA_DIRS", "/tmp/.mount_x/usr/share/:/usr/share"),
+            ("HOME", "/home/u"),
+        ]);
+        let mut got = host_env_changes("/tmp/.mount_x", vars);
+        got.sort();
+        assert_eq!(
+            got,
+            vec![
+                ("PATH".to_string(), Some("/usr/local/bin:/usr/bin".to_string())),
+                ("XDG_DATA_DIRS".to_string(), Some("/usr/share".to_string())),
+            ]
+        );
+    }
+
+    #[test]
+    fn host_env_changes_removes_variables_that_only_point_into_the_mount() {
+        let vars = env(&[
+            ("APPDIR", "/tmp/.mount_x"),
+            ("GIO_MODULE_DIR", "/tmp/.mount_x/usr/lib/gio/modules"),
+            ("PYTHONHOME", "/tmp/.mount_x/usr/"),
+        ]);
+        let mut got = host_env_changes("/tmp/.mount_x", vars);
+        got.sort();
+        assert_eq!(
+            got,
+            vec![
+                ("APPDIR".to_string(), None),
+                ("GIO_MODULE_DIR".to_string(), None),
+                ("PYTHONHOME".to_string(), None),
+            ]
+        );
+    }
+
+    #[test]
+    fn host_env_changes_only_matches_whole_path_components_of_the_mount() {
+        // Otro montaje con el mismo prefijo y una ruta del usuario que solo contiene el texto.
+        let vars = env(&[("PATH", "/tmp/.mount_xy/bin:/home/u/tmp/.mount_x/bin:/usr/bin")]);
+        assert!(host_env_changes("/tmp/.mount_x", vars).is_empty());
+    }
+
+    #[test]
+    fn host_env_changes_does_nothing_outside_an_appimage() {
+        let vars = env(&[("PATH", "/usr/bin:/bin"), ("APPDIR", "/tmp/.mount_x")]);
+        assert!(host_env_changes("", vars).is_empty());
     }
 }
