@@ -32,10 +32,15 @@ describe("PageAbout", () => {
 		expect(dl).toHaveTextContent("GPL-3.0");
 	});
 
-	it("el repositorio público figura como «Pronto» sin enlace", () => {
+	it("el repositorio es público: muestra su dirección como texto, sin «Pronto» ni enlace", () => {
 		render(<PageAbout />);
 		expect(screen.getByText("Repositorio público")).toBeInTheDocument();
-		expect(screen.getByText("Pronto")).toBeInTheDocument();
+		expect(
+			screen.getByText("https://github.com/kevincharp/knivchit"),
+		).toBeInTheDocument();
+		expect(screen.queryByText("Pronto")).not.toBeInTheDocument();
+		expect(screen.queryByText(/se publicará/)).not.toBeInTheDocument();
+		// La app no abre enlaces externos: la dirección es texto seleccionable.
 		expect(screen.queryByRole("link")).not.toBeInTheDocument();
 	});
 
@@ -63,6 +68,52 @@ describe("PageAbout", () => {
 		);
 		expect(
 			await screen.findByText("Hay una versión nueva: 0.2.0."),
+		).toBeInTheDocument();
+	});
+
+	it("con actualización: explica cómo actualizar", async () => {
+		m.checkForUpdate.mockResolvedValue({
+			has_update: true,
+			latest_version: "0.2.0",
+		});
+		render(<PageAbout />);
+		fireEvent.click(
+			screen.getByRole("button", { name: "Buscar actualizaciones" }),
+		);
+		const how = await screen.findByText(/Para actualizar/);
+		expect(how).toHaveTextContent("install.sh");
+		expect(how).toHaveTextContent("cierra sesión");
+	});
+
+	it("la versión nueva se muestra sin la «v» de la etiqueta, igual que la instalada", async () => {
+		m.getAppVersion.mockResolvedValue("0.1.0-alpha.3");
+		m.checkForUpdate.mockResolvedValue({
+			has_update: true,
+			latest_version: "v0.1.0-alpha.4",
+		});
+		render(<PageAbout />);
+		await screen.findByText("Versión 0.1.0-alpha.3");
+		fireEvent.click(
+			screen.getByRole("button", { name: "Buscar actualizaciones" }),
+		);
+		expect(
+			await screen.findByText("Hay una versión nueva: 0.1.0-alpha.4."),
+		).toBeInTheDocument();
+	});
+
+	it("sin actualización también muestra la versión sin «v»", async () => {
+		m.getAppVersion.mockResolvedValue("0.1.0-alpha.3");
+		m.checkForUpdate.mockResolvedValue({
+			has_update: false,
+			latest_version: "v0.1.0-alpha.3",
+		});
+		render(<PageAbout />);
+		await screen.findByText("Versión 0.1.0-alpha.3");
+		fireEvent.click(
+			screen.getByRole("button", { name: "Buscar actualizaciones" }),
+		);
+		expect(
+			await screen.findByText("Estás al día: tienes la versión 0.1.0-alpha.3."),
 		).toBeInTheDocument();
 	});
 

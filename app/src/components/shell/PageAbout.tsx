@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
+import { REPO_URL } from "../../lib/appName";
 import { checkForUpdate, getAppVersion } from "../../lib/tauri";
 import { Button } from "./Button";
 import { Card } from "./Card";
 import { LogoMarkLarge } from "./LogoMarkLarge";
-import { SoonBadge } from "./SoonBadge";
+
+// La etiqueta del release lleva «v» (v0.1.0-alpha.4); la versión instalada, no: se muestran igual.
+const plainVersion = (v: string) => v.replace(/^v/, "");
 
 export function PageAbout() {
 	const [version, setVersion] = useState<string | null>(null);
 	const [checking, setChecking] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 	const [failed, setFailed] = useState(false);
+	const [updateAvailable, setUpdateAvailable] = useState(false);
 
 	useEffect(() => {
 		let alive = true;
@@ -25,12 +29,15 @@ export function PageAbout() {
 		setChecking(true);
 		setMessage(null);
 		setFailed(false);
+		setUpdateAvailable(false);
 		try {
 			const info = await checkForUpdate();
+			const latest = plainVersion(info.latest_version);
+			setUpdateAvailable(info.has_update);
 			setMessage(
 				info.has_update
-					? `Hay una versión nueva: ${info.latest_version}.`
-					: `Estás al día: tienes la versión ${version ?? info.latest_version}.`,
+					? `Hay una versión nueva: ${latest}.`
+					: `Estás al día: tienes la versión ${version ?? latest}.`,
 			);
 		} catch {
 			setFailed(true);
@@ -83,16 +90,22 @@ export function PageAbout() {
 				>
 					{message}
 				</p>
+				{updateAvailable && (
+					<p className="text-xs text-[var(--color-fg-muted)]">
+						Para actualizar, vuelve a ejecutar install.sh (descárgalo del
+						repositorio) y luego cierra sesión y vuelve a entrar para cargar la
+						extensión.
+					</p>
+				)}
 			</Card>
 
 			<Card className="flex flex-col gap-1">
-				<div className="flex items-center justify-between">
-					<h2 className="text-sm font-semibold">Repositorio público</h2>
-					<SoonBadge />
-				</div>
+				<h2 className="text-sm font-semibold">Repositorio público</h2>
 				<p className="text-xs text-[var(--color-fg-muted)]">
-					El código se publicará en una versión próxima.
+					El código es abierto: puedes leerlo, reportar errores y proponer
+					ideas.
 				</p>
+				<p className="select-text break-all font-mono text-xs">{REPO_URL}</p>
 			</Card>
 		</div>
 	);
