@@ -1,0 +1,10 @@
+# Configuración de `cargo audit`. Cada excepción lleva su motivo y su seguimiento.
+[advisories]
+ignore = [
+  # Marvin Attack en `rsa 0.9.10`, sin parche en ninguna versión. Está en Cargo.lock
+  # solo porque `sqlx` registra todos sus drivers (sqlx-mysql); Knivchit usa
+  # únicamente SQLite y `rsa` no entra en el grafo compilado
+  # (`cargo tree -i rsa --target all -e all` no lo encuentra). Revisar si cambian las
+  # features de sqlx o tauri-plugin-sql.
+  "RUSTSEC-2023-0071",
+]
