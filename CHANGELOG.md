@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.0-alpha.3]
+
+Two fixes for problems found while using alpha.2. To update, run `install.sh` again and log out and back in.
+
 ### Fixed
 
 - **The default screenshots folder now follows your system language.** It used to be hardcoded to `~/Pictures/Screenshots`, so a Spanish system got a new English-named `Pictures` folder. The default is now GNOME's own screenshots folder inside your Pictures directory, with its translated name (for example `~/Imágenes/Capturas de pantalla`). If you already confirmed the old default, pick the folder again once in Settings.
@@ -63,6 +67,7 @@ Knivchit was called ViewClip during development; no public release was ever publ
 - **Install:** `install.sh` removes the old `viewclip@viewclip.dev` extension, desktop entry, autostart entry, D-Bus service, icons, binary and logs, keeping autostart under the new name. Log out and back in afterwards so GNOME loads the new extension.
 - Updating between Knivchit versions: run `install.sh` again (add `--version <tag>` to pin one).
 
-[Unreleased]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.2...HEAD
+[Unreleased]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.3...HEAD
+[0.1.0-alpha.3]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.2...v0.1.0-alpha.3
 [0.1.0-alpha.2]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.1
