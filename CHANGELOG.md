@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- **Blank window on distributions with a newer Mesa** (seen on Fedora 44, Mesa 26): the AppImage no longer bundles its own `libwayland-*`. The bundled WebKit mixed them with the system Mesa, its web process aborted with `Could not create default EGL display: EGL_BAD_PARAMETER`, and the window stayed empty. It now uses the system libraries.
+
 ## [0.1.0-alpha.1]
 
 First public **early preview**. It is not stable: expect rough edges and breaking changes, and back up anything you care about. Settings and data may be migrated or reset between versions.
