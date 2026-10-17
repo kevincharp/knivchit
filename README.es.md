@@ -49,7 +49,7 @@ bash install.sh
 
 `install.sh` está en la raíz del repositorio. Instala el AppImage en `~/.local/bin`, la entrada del menú, la activación por D-Bus y la extensión de GNOME Shell. Después **cierra la sesión y vuelve a entrar** (en Wayland GNOME no recarga extensiones en caliente) y asigna tu atajo en Configuración. Para desinstalar: `install.sh --uninstall` (no borra tus capturas ni tus datos).
 
-Mientras no haya versiones estables, `install.sh` instala el release más reciente **aunque sea un pre-release** y lo avisa antes de seguir («instalando PRE-RELEASE v0.1.0-alpha.1»). Con `bash install.sh --stable` exige una versión estable (falla si solo hay pre-releases) y con `bash install.sh --version v0.1.0-alpha.1` fijas una versión concreta. Para probar un candidato local sin red: `bash install.sh --from-dir <carpeta con el AppImage, el zip de la extensión y SHA256SUMS>`.
+Mientras no haya versiones estables, `install.sh` instala el release más reciente **aunque sea un pre-release** y lo avisa antes de seguir («instalando PRE-RELEASE v0.1.0-alpha.2»). Con `bash install.sh --stable` exige una versión estable (falla si solo hay pre-releases) y con `bash install.sh --version v0.1.0-alpha.2` fijas una versión concreta. Para probar un candidato local sin red: `bash install.sh --from-dir <carpeta con el AppImage, el zip de la extensión y SHA256SUMS>`.
 
 A mano:
 
