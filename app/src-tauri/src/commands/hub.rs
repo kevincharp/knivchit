@@ -168,6 +168,14 @@ pub fn prepare_dir_to_open(
     Ok(dir)
 }
 
+/// Carpeta de capturas por defecto de ESTE sistema (con `~`): la de GNOME dentro de «Imágenes», en
+/// el idioma del usuario. El frontend la usa para mostrarla y guardarla al confirmar la
+/// predeterminada, en vez de llevar una ruta escrita a mano.
+#[tauri::command]
+pub fn get_default_save_dir() -> Result<String, String> {
+    super::output::default_save_dir_display()
+}
+
 /// Abre en el gestor de archivos la carpeta de capturas CONFIGURADA. Es un
 /// comando propio, y no el permiso `opener:allow-open-path`, porque el scope de
 /// una capability es estático y la carpeta la elige el usuario en ejecución:

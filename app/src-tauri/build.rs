@@ -22,6 +22,7 @@ const APP_COMMANDS: &[&str] = &[
     "get_integration_status",
     "choose_save_dir",
     "open_save_dir",
+    "get_default_save_dir",
     "get_autostart",
     "set_autostart",
     "get_shortcuts",

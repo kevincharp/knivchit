@@ -1,6 +1,6 @@
 //! Regresión de instalación nueva: pulsar ↓ ANTES de aceptar el onboarding
 //! deja `screenshot_save_dir` en el valor por defecto `__PLACEHOLDER__`.
-//! Debe guardarse en «Imágenes/Knivchit» del usuario, sin crear nada hasta
+//! Debe guardarse en la carpeta de capturas de GNOME dentro de «Imágenes» del usuario, sin crear nada hasta
 //! el guardado, y toda variante del placeholder sigue siendo un error.
 //! HOME y XDG_* apuntan a directorios temporales: nunca se tocan los reales.
 
@@ -17,7 +17,8 @@ use tauri::webview::InvokeRequest;
 use tauri::WebviewWindowBuilder;
 use knivchit_lib::commands::capture_flow::CaptureState;
 use knivchit_lib::commands::output::{
-    default_save_dir, resolve_save_dir, resolve_save_dir_with, SAVE_DIR_PLACEHOLDER,
+    default_save_dir, resolve_save_dir, resolve_save_dir_with, screenshots_folder_name,
+    SAVE_DIR_PLACEHOLDER,
 };
 
 use common::*;
@@ -90,28 +91,28 @@ fn a_failing_default_lookup_is_propagated_only_for_the_placeholder() {
 
 #[test]
 fn default_save_dir_prefers_an_absolute_xdg_pictures_dir() {
-    let r = default_save_dir(Some(PathBuf::from("/data/Fotos")), Some("/home/u".into()));
-    assert_eq!(r, Ok(PathBuf::from("/data/Fotos/Knivchit")));
+    let r = default_save_dir(Some(PathBuf::from("/data/Fotos")), Some("/home/u".into()), "Capturas");
+    assert_eq!(r, Ok(PathBuf::from("/data/Fotos/Capturas")));
 }
 
 #[test]
 fn default_save_dir_falls_back_to_home_pictures() {
     assert_eq!(
-        default_save_dir(None, Some("/home/u".into())),
-        Ok(PathBuf::from("/home/u/Pictures/Knivchit"))
+        default_save_dir(None, Some("/home/u".into()), "Screenshots"),
+        Ok(PathBuf::from("/home/u/Pictures/Screenshots"))
     );
     // una carpeta XDG relativa no es de fiar
     assert_eq!(
-        default_save_dir(Some(PathBuf::from("relativa")), Some("/home/u".into())),
-        Ok(PathBuf::from("/home/u/Pictures/Knivchit"))
+        default_save_dir(Some(PathBuf::from("relativa")), Some("/home/u".into()), "Screenshots"),
+        Ok(PathBuf::from("/home/u/Pictures/Screenshots"))
     );
 }
 
 #[test]
 fn default_save_dir_fails_without_xdg_and_without_a_usable_home() {
-    assert!(default_save_dir(None, None).is_err());
-    assert!(default_save_dir(None, Some(String::new())).is_err());
-    assert!(default_save_dir(Some(PathBuf::from("rel")), None).is_err());
+    assert!(default_save_dir(None, None, "Screenshots").is_err());
+    assert!(default_save_dir(None, Some(String::new()), "Screenshots").is_err());
+    assert!(default_save_dir(Some(PathBuf::from("rel")), None, "Screenshots").is_err());
 }
 
 // --------------------------------------- extremo a extremo con HOME/XDG temporales
@@ -162,8 +163,13 @@ fn placeholder_saves_into_the_default_pictures_dir_and_creates_nothing_before_sa
     }
 
     // 1) Resolver no crea nada.
-    let esperado = pictures.join("Knivchit");
+    let esperado = pictures.join(screenshots_folder_name());
     assert_eq!(resolve_save_dir(SAVE_DIR_PLACEHOLDER), Ok(esperado.clone()));
+    // Lo que ve y guarda el frontend: la misma carpeta, con «~» y en el idioma del usuario.
+    assert_eq!(
+        knivchit_lib::commands::output::default_save_dir_display(),
+        Ok(format!("~/Imágenes/{}", screenshots_folder_name()))
+    );
     assert!(!esperado.exists(), "resolver no debe crear la carpeta");
     assert!(!pictures.exists());
     assert!(

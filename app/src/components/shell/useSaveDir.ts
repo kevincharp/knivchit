@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
 	chooseSaveDir,
+	getDefaultSaveDir,
 	getSettings,
 	type Settings,
 	updateSettings,
@@ -9,17 +10,22 @@ import {
 // Sembrado por la migración inicial (ver db/migrations.rs): vale hasta que el
 // usuario confirma una carpeta por primera vez.
 export const PLACEHOLDER_SCREENSHOT_DIR = "__PLACEHOLDER__";
-export const DEFAULT_SCREENSHOT_DIR = "~/Pictures/Screenshots";
 
 /** Carpeta de guardado de capturas: lectura, cambio con el selector y confirmación de la predeterminada. */
 export function useSaveDir() {
 	const [settings, setSettings] = useState<Settings | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	// Carpeta predeterminada de ESTE sistema, resuelta por el backend (idioma y carpeta de Imágenes
+	// del usuario): el frontend no lleva una ruta escrita a mano.
+	const [defaultDir, setDefaultDir] = useState<string | null>(null);
 
 	useEffect(() => {
 		let alive = true;
 		getSettings()
 			.then((s) => alive && setSettings(s))
+			.catch((e) => alive && setError(String(e)));
+		getDefaultSaveDir()
+			.then((d) => alive && setDefaultDir(d))
 			.catch((e) => alive && setError(String(e)));
 		return () => {
 			alive = false;
@@ -55,7 +61,7 @@ export function useSaveDir() {
 	const dir = !settings
 		? null
 		: firstRun
-			? DEFAULT_SCREENSHOT_DIR
+			? defaultDir
 			: settings.screenshot_save_dir;
 
 	return {
@@ -65,6 +71,6 @@ export function useSaveDir() {
 		firstRun,
 		error,
 		choose,
-		useDefault: () => save(DEFAULT_SCREENSHOT_DIR),
+		useDefault: () => (defaultDir ? save(defaultDir) : Promise.resolve()),
 	};
 }

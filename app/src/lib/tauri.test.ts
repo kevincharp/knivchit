@@ -32,6 +32,7 @@ import {
 	getAutostart,
 	getCapturePermission,
 	getCapturePreview,
+	getDefaultSaveDir,
 	getIntegrationStatus,
 	getPanelIcon,
 	getPinImage,
@@ -200,6 +201,12 @@ describe("contrato del hub", () => {
 	it("openSaveDir invoca open_save_dir sin argumentos", async () => {
 		await openSaveDir();
 		expect(invokeMock).toHaveBeenCalledWith("open_save_dir");
+	});
+
+	it("getDefaultSaveDir invoca get_default_save_dir y devuelve la ruta del sistema", async () => {
+		invokeMock.mockResolvedValueOnce("~/Imágenes/Capturas de pantalla");
+		expect(await getDefaultSaveDir()).toBe("~/Imágenes/Capturas de pantalla");
+		expect(invokeMock).toHaveBeenCalledWith("get_default_save_dir");
 	});
 });
 

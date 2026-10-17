@@ -12,6 +12,7 @@ const m = vi.hoisted(() => ({
 	updateSettings: vi.fn(),
 	chooseSaveDir: vi.fn(),
 	openSaveDir: vi.fn(),
+	getDefaultSaveDir: vi.fn(),
 	getAutostart: vi.fn(),
 	setAutostart: vi.fn(),
 	getShortcuts: vi.fn(),
@@ -42,6 +43,7 @@ beforeEach(() => {
 	});
 	m.updateSettings.mockResolvedValue(undefined);
 	m.openSaveDir.mockResolvedValue(undefined);
+	m.getDefaultSaveDir.mockResolvedValue("~/Imágenes/Capturas de pantalla");
 	m.getAutostart.mockResolvedValue(false);
 	m.setAutostart.mockResolvedValue(undefined);
 	m.getShortcuts.mockResolvedValue({ extension_active: true, shortcuts: {} });

@@ -14,6 +14,7 @@ const m = vi.hoisted(() => ({
 	chooseSaveDir: vi.fn(),
 	getShortcuts: vi.fn(),
 	openSaveDir: vi.fn(),
+	getDefaultSaveDir: vi.fn(),
 }));
 vi.mock("../../lib/tauri", () => m);
 
@@ -50,6 +51,7 @@ beforeEach(() => {
 	});
 	m.updateSettings.mockResolvedValue(undefined);
 	m.openSaveDir.mockResolvedValue(undefined);
+	m.getDefaultSaveDir.mockResolvedValue("~/Imágenes/Capturas de pantalla");
 });
 afterEach(cleanup);
 
@@ -170,10 +172,12 @@ describe("PageHome — primer uso (sustituye al Onboarding)", () => {
 			screen.getByText("Activa la extensión de GNOME Shell"),
 		).toBeInTheDocument();
 		expect(screen.getByText("Elige tu atajo")).toBeInTheDocument();
-		expect(screen.getByText("~/Pictures/Screenshots")).toBeInTheDocument();
+		expect(
+			screen.getByText("~/Imágenes/Capturas de pantalla"),
+		).toBeInTheDocument();
 	});
 
-	it("«Usar la predeterminada» guarda ~/Pictures/Screenshots y cierra la lista", async () => {
+	it("«Usar la predeterminada» guarda la carpeta del sistema (la que da el backend) y cierra la lista", async () => {
 		mount();
 		fireEvent.click(
 			await screen.findByRole("button", { name: "Usar la predeterminada" }),
@@ -181,7 +185,7 @@ describe("PageHome — primer uso (sustituye al Onboarding)", () => {
 		await waitFor(() =>
 			expect(m.updateSettings).toHaveBeenCalledWith({
 				...base,
-				screenshot_save_dir: "~/Pictures/Screenshots",
+				screenshot_save_dir: "~/Imágenes/Capturas de pantalla",
 			}),
 		);
 		await waitFor(() =>

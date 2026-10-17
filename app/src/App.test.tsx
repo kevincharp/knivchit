@@ -13,6 +13,9 @@ vi.mock("./lib/tauri", () => ({
 	}),
 	getIntegrationStatus: vi.fn().mockResolvedValue({ extension_active: true }),
 	openSaveDir: vi.fn(),
+	getDefaultSaveDir: vi
+		.fn()
+		.mockResolvedValue("~/Imágenes/Capturas de pantalla"),
 	chooseSaveDir: vi.fn(),
 	updateSettings: vi.fn(),
 	getCapturePermission: vi.fn().mockResolvedValue({

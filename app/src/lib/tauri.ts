@@ -160,6 +160,11 @@ export async function openSaveDir(): Promise<void> {
 	return invoke("open_save_dir");
 }
 
+/** Carpeta de capturas por defecto de este sistema (con `~`), en el idioma del usuario: la decide el backend. */
+export async function getDefaultSaveDir(): Promise<string> {
+	return invoke<string>("get_default_save_dir");
+}
+
 export interface ShortcutsState {
 	/** La extensión de GNOME Shell está cargada: sin ella no se pueden leer ni cambiar atajos. */
 	extension_active: boolean;

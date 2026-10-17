@@ -313,6 +313,7 @@ pub fn run() {
             commands::hub::get_integration_status,
             commands::hub::choose_save_dir,
             commands::hub::open_save_dir,
+            commands::hub::get_default_save_dir,
             commands::hub::get_autostart,
             commands::hub::set_autostart,
             commands::shortcuts::get_shortcuts,

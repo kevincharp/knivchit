@@ -146,22 +146,64 @@ pub fn with_pending<T>(
     result
 }
 
+/// Nombre de carpeta usable como un único componente de ruta. Si el candidato (p. ej. una
+/// traducción) está vacío, es `.`/`..`, o lleva `/`, `%` (la ruta guardada se decodifica como URL),
+/// NUL o saltos de línea, se devuelve el nombre sin traducir, `Screenshots`.
+pub fn safe_folder_name(candidate: &str) -> String {
+    let name = candidate.trim();
+    let bad = name.is_empty()
+        || name == "."
+        || name == ".."
+        || name.chars().any(|c| matches!(c, '/' | '%' | '\0' | '\n' | '\r'));
+    if bad { "Screenshots".to_string() } else { name.to_string() }
+}
+
+/// Nombre de la carpeta de capturas: el MISMO que usa GNOME, traducido al idioma del usuario
+/// («Capturas de pantalla», «Captures d’écran», «Bildschirmfotos»…). Sale del dominio de
+/// traducción `gnome-shell`; sin traducción queda `Screenshots`.
+pub fn screenshots_folder_name() -> String {
+    safe_folder_name(gtk::glib::dgettext(Some("gnome-shell"), "Screenshots").as_str())
+}
+
 /// Carpeta por defecto mientras la configuración sigue en el placeholder:
-/// «Imágenes» del usuario según XDG (o `$HOME/Pictures`) + `Knivchit`.
-pub fn default_save_dir(pictures: Option<PathBuf>, home: Option<String>) -> Result<PathBuf, String> {
+/// «Imágenes» del usuario según XDG (o `$HOME/Pictures`) + `folder` (el nombre de la carpeta de
+/// capturas de GNOME en su idioma, ver `screenshots_folder_name`).
+pub fn default_save_dir(
+    pictures: Option<PathBuf>,
+    home: Option<String>,
+    folder: &str,
+) -> Result<PathBuf, String> {
     let base = match (pictures, home) {
         (Some(p), _) if p.is_absolute() => p,
         (_, Some(h)) if !h.is_empty() => PathBuf::from(h).join("Pictures"),
         _ => return Err("no se pudo determinar la carpeta de imágenes del usuario".to_string()),
     };
-    Ok(base.join("Knivchit"))
+    Ok(base.join(safe_folder_name(folder)))
 }
 
 fn system_default_save_dir() -> Result<PathBuf, String> {
     default_save_dir(
         gtk::glib::user_special_dir(gtk::glib::UserDirectory::Pictures),
         std::env::var("HOME").ok(),
+        &screenshots_folder_name(),
     )
+}
+
+/// `path` con `~` en lugar de `home` si está DENTRO de `home` (por componentes: `/home/uu` no
+/// está en `/home/u`); fuera de `home` se deja absoluta.
+pub fn tilde_form(path: &Path, home: &str) -> String {
+    match path.strip_prefix(home) {
+        Ok(rest) if rest.as_os_str().is_empty() => "~".to_string(),
+        Ok(rest) => format!("~/{}", rest.display()),
+        Err(_) => path.display().to_string(),
+    }
+}
+
+/// La carpeta por defecto del sistema, lista para mostrarla y guardarla (con `~`).
+pub fn default_save_dir_display() -> Result<String, String> {
+    let dir = system_default_save_dir()?;
+    let home = std::env::var("HOME").unwrap_or_default();
+    Ok(if home.is_empty() { dir.display().to_string() } else { tilde_form(&dir, &home) })
 }
 
 /// Carpetas de `$HOME` donde guardar un PNG pondría un archivo a disposición
@@ -639,15 +681,44 @@ mod tests {
     #[test]
     fn default_save_dir_prefers_xdg_pictures_then_home() {
         assert_eq!(
-            default_save_dir(Some("/home/u/Imágenes".into()), Some("/home/u".into())),
-            Ok(PathBuf::from("/home/u/Imágenes/Knivchit"))
+            default_save_dir(Some("/home/u/Imágenes".into()), Some("/home/u".into()), "Capturas de pantalla"),
+            Ok(PathBuf::from("/home/u/Imágenes/Capturas de pantalla"))
         );
         assert_eq!(
-            default_save_dir(None, Some("/home/u".into())),
-            Ok(PathBuf::from("/home/u/Pictures/Knivchit"))
+            default_save_dir(None, Some("/home/u".into()), "Screenshots"),
+            Ok(PathBuf::from("/home/u/Pictures/Screenshots"))
         );
-        assert!(default_save_dir(None, None).is_err());
-        assert!(default_save_dir(Some("relativa".into()), Some(String::new())).is_err());
+        assert!(default_save_dir(None, None, "Screenshots").is_err());
+        assert!(default_save_dir(Some("relativa".into()), Some(String::new()), "Screenshots").is_err());
+    }
+
+    #[test]
+    fn safe_folder_name_keeps_a_plain_translation_and_falls_back_otherwise() {
+        assert_eq!(safe_folder_name("Capturas de pantalla"), "Capturas de pantalla");
+        assert_eq!(safe_folder_name("Captures d’écran"), "Captures d’écran");
+        for bad in ["", "   ", ".", "..", "a/b", "/abs", "x%2Fy", "nul\0", "con\nsalto"] {
+            assert_eq!(safe_folder_name(bad), "Screenshots", "{bad:?}");
+        }
+    }
+
+    #[test]
+    fn tilde_form_shortens_only_paths_inside_home() {
+        let home = "/home/u";
+        assert_eq!(tilde_form(Path::new("/home/u/Imágenes/Capturas de pantalla"), home), "~/Imágenes/Capturas de pantalla");
+        assert_eq!(tilde_form(Path::new("/home/u"), home), "~");
+        // «/home/uu» no está dentro de «/home/u», y fuera de HOME se deja absoluta.
+        assert_eq!(tilde_form(Path::new("/home/uu/x"), home), "/home/uu/x");
+        assert_eq!(tilde_form(Path::new("/data/Fotos/Screenshots"), home), "/data/Fotos/Screenshots");
+    }
+
+    #[test]
+    fn tilde_form_round_trips_through_resolve_save_dir() {
+        let home = std::env::var("HOME").unwrap_or_default();
+        if home.is_empty() {
+            return;
+        }
+        let dir = Path::new(&home).join("Imágenes").join("Capturas de pantalla");
+        assert_eq!(resolve_save_dir(&tilde_form(&dir, &home)), Ok(dir));
     }
 
     #[test]
