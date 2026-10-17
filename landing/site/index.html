@@ -44,8 +44,8 @@
   "softwareVersion": "0.1.0-alpha.1",
   "inLanguage": "en",
   "url": "https://knivchit.pages.dev/",
-
-
+  "downloadUrl": "https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.1",
+  "codeRepository": "https://github.com/kevincharp/knivchit",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
 }
 </script>
@@ -125,11 +125,11 @@
       </div>
       <div class="hero-pill">
 
-        <a class="btn btn-main" href="#install" aria-describedby="soon-note">Install</a>
-        <span class="soon-note" id="soon-note">Coming soon</span>
+        <a class="btn btn-main" href="https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.1">Install</a>
+        <span class="soon-note">pre-release</span>
 
 
-        <span class="btn btn-ghost btn-off" aria-disabled="true">GitHub, public soon</span>
+        <a class="btn btn-ghost" href="https://github.com/kevincharp/knivchit" rel="noopener">GitHub</a>
 
       </div>
     </div>
@@ -424,7 +424,7 @@
       </section>
       <section class="inst-col" aria-labelledby="inst-script-h">
         <h3 id="inst-script-h">With the script</h3>
-        <p class="state">No release published yet. These commands apply from the first release.</p>
+
         <p>Downloads the latest release (a pre-release while no stable one exists), verifies the checksums and installs the app and the extension.</p>
         <div class="cmd">
           <pre class="code" tabindex="0" aria-label="Install command"><code id="cmd-script">curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/kevincharp/knivchit/main/install.sh -o install.sh &amp;&amp; less install.sh &amp;&amp; bash install.sh</code></pre>
@@ -476,7 +476,7 @@ gnome-extensions enable knivchit@knivchit.dev</code></pre>
 
         <details>
           <summary>Is it stable?</summary>
-          <p>No. Knivchit is an early preview (alpha). There are no compatibility guarantees between versions: settings and data may be migrated or reset, and things can break. Back up anything you care about, and report problems through issues. While no stable release exists, the installer picks the latest pre-release (<code>--stable</code> refuses that).</p>
+          <p>No. Knivchit is an early preview (alpha). There are no compatibility guarantees between versions: settings and data may be migrated or reset, and things can break. Back up anything you care about, and report problems through <a href="https://github.com/kevincharp/knivchit/issues/new/choose" rel="noopener">issues</a>. While no stable release exists, the installer picks the latest pre-release (<code>--stable</code> refuses that).</p>
         </details>
 
         <details>
@@ -520,7 +520,7 @@ gnome-extensions enable knivchit@knivchit.dev</code></pre>
 
         <details>
           <summary>How do I report a bug or suggest an idea?</summary>
-          <p>Open an issue with the bug or feature template. Knivchit is issues-first: the maintainer handles issues, and pull requests are only accepted for an issue that was approved first, or for very small fixes.</p>
+          <p>Open an issue with the bug or feature template on <a href="https://github.com/kevincharp/knivchit/issues/new/choose" rel="noopener">GitHub</a>. Knivchit is issues-first: the maintainer handles issues, and pull requests are only accepted for an issue that was approved first, or for very small fixes.</p>
         </details>
 
         <details>
@@ -530,7 +530,7 @@ gnome-extensions enable knivchit@knivchit.dev</code></pre>
 
         <details>
           <summary>Where is the code?</summary>
-          <p>The repository isn't public yet. When it is, the link will appear on this page.</p>
+          <p>The code is in the <a href="https://github.com/kevincharp/knivchit" rel="noopener">public repository</a>.</p>
         </details>
 
         <details>
@@ -552,6 +552,8 @@ gnome-extensions enable knivchit@knivchit.dev</code></pre>
       <div><dt>Open an issue</dt><dd>The normal way to help is to open an issue with the bug or feature template. The maintainer fixes it.</dd></div><div><dt>Pull requests, by invitation</dt><dd>A PR is accepted only against an issue the maintainer has approved, or for a very small, self-contained fix such as a typo. Larger PRs without an approved issue are closed unreviewed, and there's no promise of a fast review.</dd></div><div><dt>Security problems</dt><dd>Report vulnerabilities privately through GitHub's private vulnerability reporting, never in a public issue.</dd></div>
     </dl>
 
+    <p class="links"><a class="btn btn-main" href="https://github.com/kevincharp/knivchit/issues/new/choose" rel="noopener">Open an issue</a> <a class="btn btn-line" href="https://github.com/kevincharp/knivchit/blob/main/CONTRIBUTING.md" rel="noopener">Contributing guide</a> <a class="btn btn-line" href="https://github.com/kevincharp/knivchit/security/policy" rel="noopener">Security policy</a></p>
+
   </section>
 </main>
 
@@ -559,7 +561,7 @@ gnome-extensions enable knivchit@knivchit.dev</code></pre>
   <div class="foot-brand"><svg class="logo" aria-hidden="true"><use href="#i-logo"/></svg><span class="wordmark">kniv<span class="wm-ch">ch</span>it</span></div>
   <p>Knivchit v0.1.0-alpha.1, early preview. Free, open source and without tracking.</p>
   <p>The app is MIT; the GNOME Shell extension is GPL-3.0-or-later.</p>
-  <p><span class="soon-text">GitHub, public soon</span></p>
+  <p><a href="https://github.com/kevincharp/knivchit" rel="noopener">GitHub</a></p>
   <p>Created by <a href="https://github.com/kevincharp" rel="noopener">Kevin Charpentier</a>.</p>
   <p class="fine">No cookies, no analytics, no third-party services.</p>
   <p class="legal">Typefaces: <a href="/assets/fonts/LICENSE-Inter.txt">Inter</a> and <a href="/assets/fonts/LICENSE-Bricolage-Grotesque.txt">Bricolage Grotesque</a>, SIL OFL 1.1, hosted on this site.</p>
