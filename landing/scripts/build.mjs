@@ -65,7 +65,7 @@ const root_ctx = {
 	slotHtml,
 	...strings,
 	cfg: { ...config },
-	has: { repo: Boolean(config.REPO_URL), release: Boolean(config.RELEASE_URL) },
+	has: { repo: Boolean(config.REPO_URL), release: Boolean(config.RELEASE_URL), sponsor: Boolean(config.SPONSOR_URL) },
 };
 
 const partials = new Map();

@@ -295,7 +295,8 @@
   <p>{{footer.tagline}}</p>
   <p>{{footer.licenses}}</p>
   <p>{{#if has.repo}}<a href="{{cfg.REPO_URL}}" rel="noopener">{{actions.repo}}</a>{{else}}<span class="soon-text">{{actions.repoSoon}}</span>{{/if}}</p>
-  <p>{{footer.created}}</p>
+  {{#if has.sponsor}}<p><a href="{{cfg.SPONSOR_URL}}" rel="noopener">{{actions.sponsor}}</a></p>
+  {{/if}}<p>{{footer.created}}</p>
   <p class="fine">{{footer.noTracking}}</p>
   <p class="legal">{{footer.fonts}}</p>
 </footer>

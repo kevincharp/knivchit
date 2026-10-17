@@ -42,7 +42,8 @@
     "how": "See how it works",
     "issues": "Open an issue",
     "contributing": "Contributing guide",
-    "security": "Security policy"
+    "security": "Security policy",
+    "sponsor": "Support the project"
   },
   "hero": {
     "h1": "Screenshots with annotations, built for GNOME on Wayland",
