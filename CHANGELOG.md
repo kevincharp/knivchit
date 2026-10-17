@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- **The dock no longer pops up when you press the capture shortcut.** The capture overlay was created without focus, Wayland flagged it as "needs attention", and docks such as Dash to Dock revealed themselves showing the Knivchit icon. The GNOME Shell extension now activates the overlay as soon as it appears. This needs the updated extension and a new login session.
 - **Blank window on distributions with a newer Mesa** (seen on Fedora 44, Mesa 26): the AppImage no longer bundles its own `libwayland-*`. The bundled WebKit mixed them with the system Mesa, its web process aborted with `Could not create default EGL display: EGL_BAD_PARAMETER`, and the window stayed empty. It now uses the system libraries.
 
 ## [0.1.0-alpha.1]
