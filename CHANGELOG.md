@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- **"Open folder" in Settings opened a web browser instead of the file manager.** Inside the AppImage the helper process inherited the AppImage's own library and search paths, `gio` failed and `xdg-open` fell back to `$BROWSER`. It now runs with the system's environment.
+
 ## [0.1.0-alpha.2]
 
 Fixes two problems found in the first real install of alpha.1. If you installed alpha.1, run `install.sh` again to update and then log out and back in.
