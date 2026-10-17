@@ -253,7 +253,7 @@
       "copied": "Copied",
       "copyFailed": "Select and copy manually",
       "copyAria": "Copy the install command",
-      "read": "Opens the script in <code>less</code> first; press <code>q</code> to continue. <code>--stable</code> requires a stable version; <code>--version v0.1.0-alpha.1</code> pins one.",
+      "read": "Opens the script in <code>less</code> first; press <code>q</code> to continue. <code>--stable</code> requires a stable version; <code>--version v0.1.0-alpha.2</code> pins one.",
       "after": "It prints “installing PRE-RELEASE …” first. When done, log out and back in once, then assign your shortcut in Settings."
     },
     "hand": {
