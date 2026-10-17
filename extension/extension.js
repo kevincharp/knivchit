@@ -143,6 +143,11 @@ export default class KnivchitExtension extends Extension {
     this._windowCreatedId = global.display.connect("window-created", (_display, win) =>
       this._watchWindow(win),
     );
+    // Red de seguridad: si Mutter aun así marca el overlay como «pide atención», se activa para
+    // limpiar la marca (ver _activateOverlay).
+    this._attentionId = global.display.connect("window-demands-attention", (_display, win) =>
+      this._activateOverlay(win),
+    );
     for (const actor of global.get_window_actors()) this._watchWindow(actor.meta_window);
 
     // TODO (más adelante, dentro de esta misma épica): St.Clipboard.get_default()
@@ -157,6 +162,7 @@ export default class KnivchitExtension extends Extension {
     const check = () => {
       if (isPinWindowTitle(win.get_title()) && !win.is_above()) win.make_above();
       this._placeMainWindow(win);
+      this._activateOverlay(win);
     };
     const id = win.connect("notify::title", check);
     const sizeId = win.connect("size-changed", () => this._placeMainWindow(win));
@@ -165,6 +171,16 @@ export default class KnivchitExtension extends Extension {
     });
     this._titleHandlers.set(win, [id, sizeId, unmanagedId]);
     check();
+  }
+
+  // El overlay de captura nace desde el atajo, con la app en segundo plano: Wayland trata su
+  // set_focus como «demanda de atención» y los docks (Dash to Dock, el dash del Shell) se muestran
+  // para avisar, con el icono de Knivchit, justo cuando el usuario no quiere nada en pantalla. La
+  // extensión, que es el compositor, lo activa nada más crearse (y otra vez si Mutter lo marca
+  // igualmente) para que nazca con el foco. Solo el overlay de la propia app, por título y PID.
+  _activateOverlay(win) {
+    if (!this._active || !isCaptureOverlayTitle(win.get_title()) || !isOwnedByApp(win.get_pid(), this._appPid)) return;
+    Main.activateWindow(win);
   }
 
   // Mutter termina su colocación inicial de la ventana en el mismo ciclo en que
@@ -411,6 +427,8 @@ export default class KnivchitExtension extends Extension {
     Main.wm.removeKeybinding(CAPTURE_KEYBINDING_NAME);
     if (this._windowCreatedId) global.display.disconnect(this._windowCreatedId);
     this._windowCreatedId = null;
+    if (this._attentionId) global.display.disconnect(this._attentionId);
+    this._attentionId = null;
     for (const [win, ids] of this._titleHandlers ?? []) for (const id of ids) win.disconnect(id);
     this._titleHandlers = null;
     this._unwatchApp?.();
