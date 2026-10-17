@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.0-alpha.4]
+
+Fixes the About page, which still said the repository was not public yet. To update, run `install.sh` again and log out and back in.
+
+### Fixed
+
+- **About page:** the "public repository" card no longer says the code will be published later. It now shows the repository address (the app cannot open external links, so it is plain, selectable text).
+- **Update message:** when a newer version exists, it now explains how to update (run `install.sh` again, then log out and back in).
+- **Version format:** the new version is shown without the tag's leading `v`, the same way as the installed one.
+
 ## [0.1.0-alpha.3]
 
 Two fixes for problems found while using alpha.2. To update, run `install.sh` again and log out and back in.
@@ -67,7 +77,8 @@ Knivchit was called ViewClip during development; no public release was ever publ
 - **Install:** `install.sh` removes the old `viewclip@viewclip.dev` extension, desktop entry, autostart entry, D-Bus service, icons, binary and logs, keeping autostart under the new name. Log out and back in afterwards so GNOME loads the new extension.
 - Updating between Knivchit versions: run `install.sh` again (add `--version <tag>` to pin one).
 
-[Unreleased]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.3...HEAD
+[Unreleased]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.4...HEAD
+[0.1.0-alpha.4]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.3...v0.1.0-alpha.4
 [0.1.0-alpha.3]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.2...v0.1.0-alpha.3
 [0.1.0-alpha.2]: https://github.com/kevincharp/knivchit/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.1
