@@ -49,7 +49,7 @@ bash install.sh
 
 It installs the AppImage in `~/.local/bin`, the application menu entry, the D-Bus activation and the GNOME Shell extension. Then **log out and back in** (on Wayland, GNOME only loads new extensions at session start) and assign your shortcut in Settings. To uninstall: `bash install.sh --uninstall` (your captures and data are left alone).
 
-While no stable release exists, the script installs the latest release **even if it is a pre-release** and says so first ("installing PRE-RELEASE v0.1.0-alpha.2"). `bash install.sh --stable` requires a stable version (it fails if there are only pre-releases); `bash install.sh --version v0.1.0-alpha.2` pins one. To test a local candidate offline: `bash install.sh --from-dir <folder with the AppImage, the extension zip and SHA256SUMS>`.
+While no stable release exists, the script installs the latest release **even if it is a pre-release** and says so first ("installing PRE-RELEASE v0.1.0-alpha.3"). `bash install.sh --stable` requires a stable version (it fails if there are only pre-releases); `bash install.sh --version v0.1.0-alpha.3` pins one. To test a local candidate offline: `bash install.sh --from-dir <folder with the AppImage, the extension zip and SHA256SUMS>`.
 
 By hand:
 
