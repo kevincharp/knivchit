@@ -56,6 +56,11 @@ jobs:
       - name: Build de la app y empaquetado AppImage
         run: cd app && APPIMAGE_EXTRACT_AND_RUN=1 NO_STRIP=1 pnpm tauri build --bundles appimage
 
+      # El AppImage trae las libwayland de este Ubuntu 22.04; con un Mesa más nuevo en el sistema
+      # el WebKit empaquetado aborta (EGL_BAD_PARAMETER) y la ventana queda en blanco.
+      - name: Quitar las libwayland del AppImage
+        run: ./app/scripts/sin-libwayland.sh "$BUNDLE_DIR"
+
       - name: Empaquetar la extension GNOME
         run: ./extension/package.sh "$BUNDLE_DIR"
 
