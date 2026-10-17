@@ -6,15 +6,13 @@
 
 Created by [Kevin Charpentier](https://github.com/kevincharp).
 
-Website: <https://knivchit.pages.dev>
-
 > **Early preview, not stable yet.** Expect rough edges and breaking changes between versions. Settings and data may be migrated or reset, so back up anything you care about.
 
 **Screenshots with annotations, built for GNOME on Wayland.** Knivchit freezes your screen, lets you draw a rounded selection, mark it up with arrows, text and mosaic, then copy, save or pin the result. Everything stays on your machine: no accounts, no telemetry, and no network except when you ask it to check for updates.
 
 <!-- IMAGE: real screenshot of the capture overlay (docs/img/overlay.png). Pending. -->
 
-Website: `<DOMAIN>` (to be decided) · Repository: <https://github.com/kevincharp/knivchit>
+Website: <https://knivchit.pages.dev> · Repository: <https://github.com/kevincharp/knivchit>
 
 ## Status
 
