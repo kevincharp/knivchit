@@ -6,6 +6,8 @@
 
 Creado por [Kevin Charpentier](https://github.com/kevincharp).
 
+Sitio web: <https://knivchit.pages.dev>
+
 **Captura, anota y fija tu pantalla en GNOME.** Un capturador moderno para Linux sobre Wayland: selección con esquinas redondeadas, anotaciones y mosaico, y todo en local: sin cuentas, sin telemetría y sin red salvo cuando tú buscas actualizaciones.
 
 <!-- IMAGEN: captura real del overlay con una selección y anotaciones (docs/img/overlay.png). Pendiente: no se inventa. -->
