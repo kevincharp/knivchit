@@ -2,8 +2,8 @@
   "_nota": "Constantes únicas del sitio. REPO_URL y RELEASE_URL vacías = marcador «Disponible próximamente»; al rellenarlas y ejecutar `node landing/scripts/build.mjs`, los enlaces se activan. SPONSOR_URL vacía = no se muestra ningún enlace de apoyo al proyecto (donaciones voluntarias). SITE_URL es el dominio final (aún sin decidir): se puede sobrescribir con la variable de entorno SITE_URL.",
   "SITE_URL": "https://knivchit.pages.dev",
   "REPO_URL": "https://github.com/kevincharp/knivchit",
-  "RELEASE_URL": "https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.3",
+  "RELEASE_URL": "https://github.com/kevincharp/knivchit/releases/tag/v0.1.0-alpha.4",
   "SPONSOR_URL": "",
-  "VERSION": "0.1.0-alpha.3",
+  "VERSION": "0.1.0-alpha.4",
   "LOCALE": "en"
 }
