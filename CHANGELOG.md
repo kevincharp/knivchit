@@ -10,6 +10,7 @@ Fixes the About page, which still said the repository was not public yet. To upd
 
 ### Fixed
 
+- **Installer and uninstaller with Knivchit running:** `install.sh` (install, update and `--uninstall`) no longer replaces or removes files under a running Knivchit. In a terminal it asks whether to close it; without one it refuses and changes nothing. `--close-app` closes it without asking. Only processes of this installation are touched.
 - **About page:** the "public repository" card no longer says the code will be published later. It now shows the repository address (the app cannot open external links, so it is plain, selectable text).
 - **Update message:** when a newer version exists, it now explains how to update (run `install.sh` again, then log out and back in).
 - **Version format:** the new version is shown without the tag's leading `v`, the same way as the installed one.
