@@ -4,7 +4,6 @@
 fn main() {
     // Antes de cualquier hilo o de inicializar GTK (ver platform.rs).
     knivchit_lib::platform::apply_gdk_backend();
-    knivchit_lib::platform::apply_webkit_env();
     let args: Vec<String> = std::env::args().collect();
     if args.len() > 1 && args[1] == "--version" {
         println!("knivchit {}", env!("CARGO_PKG_VERSION"));
