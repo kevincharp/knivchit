@@ -15,8 +15,7 @@ use tauri::http::HeaderMap;
 use tauri::ipc::{InvokeBody, Request};
 use tauri::{AppHandle, Runtime, State};
 
-use super::capture_flow::{expand_tilde, finish_capture_ui, CaptureState};
-use crate::monitors::CaptureOutcome;
+use super::capture_flow::{expand_tilde, CaptureState};
 use crate::capture::{percent_decode, uri_to_path};
 
 pub const MAX_PNG_BYTES: usize = 64 * 1024 * 1024;
@@ -281,8 +280,7 @@ fn save_capture_impl(
 /// webview: así un webview comprometido no puede escribir en una ruta arbitraria. Cualquier
 /// header de carpeta que llegue en la petición se ignora.
 #[tauri::command]
-pub async fn save_capture<R: Runtime>(
-    app: AppHandle<R>,
+pub async fn save_capture(
     request: Request<'_>,
     state: State<'_, CaptureState>,
     pool: State<'_, SqlitePool>,
@@ -290,7 +288,6 @@ pub async fn save_capture<R: Runtime>(
     let bytes = raw_body(&request)?.to_vec();
     let settings = crate::db::get_settings(&pool).await.map_err(|e| e.to_string())?;
     let saved = save_capture_impl(&state.0, &bytes, &settings.screenshot_save_dir, &local_stamp())?;
-    finish_capture_ui(&app, CaptureOutcome::Saved);
     spawn_saved_notification(saved.clone());
     Ok(saved)
 }
@@ -346,8 +343,7 @@ async fn pick_save_as_path(default_dir: &Path, default_name: &str) -> Result<Opt
 /// imágenes) como punto de partida. Si cancela, la captura sigue pendiente
 /// para reintentar sin recapturar.
 #[tauri::command]
-pub async fn save_capture_as<R: Runtime>(
-    app: AppHandle<R>,
+pub async fn save_capture_as(
     request: Request<'_>,
     state: State<'_, CaptureState>,
     pool: State<'_, SqlitePool>,
@@ -373,7 +369,6 @@ pub async fn save_capture_as<R: Runtime>(
     })?;
 
     let saved = chosen.to_string_lossy().into_owned();
-    finish_capture_ui(&app, CaptureOutcome::Saved);
     spawn_saved_notification(saved.clone());
     Ok(Some(saved))
 }
@@ -448,9 +443,6 @@ pub fn copy_capture<R: Runtime>(
         rx.recv()
             .map_err(|_| "el hilo principal no respondió".to_string())?
     });
-    if copied.is_ok() {
-        finish_capture_ui(&app, CaptureOutcome::Copied);
-    }
     copied
 }
 

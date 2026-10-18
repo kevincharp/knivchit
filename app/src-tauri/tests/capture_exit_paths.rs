@@ -1,13 +1,7 @@
-//! La ventana principal es solo configuración: NUNCA se vuelve a mostrar
-//! sola por una captura, sea cual sea el desenlace (decisión de producto
-//! tras la segunda prueba manual — antes se restauraba si había estado
-//! visible, y la ventana de ajustes aparecía sin sentido al copiar o
-//! guardar). `finish_capture_ui` es ahora un no-op a propósito: no hay
-//! `should_restore_main`/`MainRestore` que testear como decisión pura
-//! porque ya no existe ninguna decisión — así que este archivo solo fija
-//! lo observable con runtime simulado (las vías de salida responden,
-//! consumen o conservan la captura pendiente, y `finish_capture_ui` no
-//! entra en pánico con ningún desenlace).
+//! Vías de salida de una captura con runtime simulado: cancelar y guardar responden y consumen la
+//! captura pendiente, y un error de validación la conserva para reintentar. Con y sin
+//! `CaptureActivity` registrada. (El runtime simulado no refleja `hide()`/`show()` en
+//! `is_visible()`, así que aquí no se observa qué ventana se muestra.)
 
 mod common;
 
@@ -18,32 +12,9 @@ use tauri::ipc::{CallbackFn, InvokeBody};
 use tauri::test::{mock_builder, mock_context, noop_assets, INVOKE_KEY};
 use tauri::webview::InvokeRequest;
 use tauri::{Manager, WebviewWindowBuilder};
-use knivchit_lib::commands::capture_flow::{finish_capture_ui, CaptureActivity, CaptureState};
-use knivchit_lib::monitors::CaptureOutcome;
+use knivchit_lib::commands::capture_flow::{CaptureActivity, CaptureState};
 
 use common::*;
-
-const OUTCOMES: [CaptureOutcome; 7] = [
-    CaptureOutcome::Saved,
-    CaptureOutcome::Copied,
-    CaptureOutcome::Pinned,
-    CaptureOutcome::Cancelled,
-    CaptureOutcome::Error,
-    CaptureOutcome::OverlayTimeout,
-    CaptureOutcome::IdleTimeout,
-];
-
-// -------------------------------------------- vías de salida con runtime simulado
-//
-// LIMITACIÓN: la ventana del runtime simulado no refleja `hide()`/`show()` en
-// `is_visible()` (siempre devuelve `true`), así que aquí NO se puede observar
-// si la principal se muestra. Lo que SÍ se fija: `finish_capture_ui` no hace
-// nada que pueda entrar en pánico para ningún desenlace, con y sin
-// `CaptureActivity` registrada; y las vías de salida consumen o conservan la
-// captura pendiente como corresponde. «"main" nunca se muestra sola» queda
-// cubierto por la ausencia misma de esa llamada en el código (ver
-// `finish_capture_ui` en `capture_flow.rs`) y por la lista de verificación
-// manual.
 
 type App = tauri::App<tauri::test::MockRuntime>;
 type Win = tauri::WebviewWindow<tauri::test::MockRuntime>;
@@ -94,16 +65,6 @@ fn invoke(
 
 fn pending_set(app: &App) -> bool {
     app.state::<CaptureState>().0.lock().unwrap().is_some()
-}
-
-#[test]
-fn finish_capture_ui_is_a_harmless_noop_for_every_outcome() {
-    for with_activity in [true, false] {
-        let (app, _main) = build(with_activity, false);
-        for outcome in OUTCOMES {
-            finish_capture_ui(app.handle(), outcome);
-        }
-    }
 }
 
 #[test]

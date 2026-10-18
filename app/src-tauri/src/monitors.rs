@@ -154,18 +154,6 @@ pub fn idle_watch(capture_pending: bool, idle_ms: u64, limit_ms: u64) -> IdleWat
     }
 }
 
-/// Cómo terminó una captura (todos los caminos de salida).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CaptureOutcome {
-    Saved,
-    Copied,
-    Pinned,
-    Cancelled,
-    Error,
-    OverlayTimeout,
-    IdleTimeout,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

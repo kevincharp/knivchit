@@ -2,12 +2,12 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use base64::Engine;
-use tauri::{AppHandle, Emitter, Manager, Runtime, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use tauri::{AppHandle, Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 use crate::capture::{self, PortalFailure};
 use crate::capture_permission::{CaptureErrorCode, CapturePermission, CapturePermissionState};
 use super::capture_access::{acquire_photo, request_permission, CaptureEnv, Trigger};
-use crate::monitors::{self, CaptureOutcome, CropRect, IdleWatch, MonitorGeom, OverlayWatch};
+use crate::monitors::{self, CropRect, IdleWatch, MonitorGeom, OverlayWatch};
 
 pub(crate) const OVERLAY_LABEL: &str = "capture-overlay";
 const OVERLAY_TITLE: &str = "knivchit-capture-overlay";
@@ -131,18 +131,6 @@ impl Drop for RunningGuard {
     }
 }
 
-/// Punto de cierre de la captura en curso. Decisión de producto tras la
-/// pruebas manuales: "main" es solo la ventana de ajustes y
-/// NUNCA debe reaparecer sola por una captura, sea cual sea el desenlace —
-/// antes se restauraba si había estado visible, y eso hacía aparecer la
-/// ventana de ajustes sin sentido al copiar o guardar. Si estaba visible,
-/// `trigger_capture` ya la ocultó al empezar (ver `hide_and_capture`) y se
-/// queda así; no hay nada que hacer acá. La firma queda igual a propósito:
-/// los 8 call sites (acá, `output.rs`, `pin.rs`) documentan con qué
-/// desenlace terminó cada captura, información real del flujo aunque ya no
-/// dispare ningún efecto en este punto.
-pub fn finish_capture_ui<R: Runtime>(_app: &AppHandle<R>, _outcome: CaptureOutcome) {}
-
 /// El frontend la llama ante cualquier interacción (ratón, teclado,
 /// selección) para reiniciar el contador de inactividad.
 #[tauri::command]
@@ -189,16 +177,14 @@ pub async fn trigger_capture(app: &AppHandle, trigger: Trigger) -> Result<(), St
     eprintln!("knivchit: captura #{number} iniciada ({} ms desde la época)", unix_millis());
     let env = AppEnv { app: app.clone() };
 
-    // Desde aquí la ventana principal puede estar oculta. Si algo falla se
-    // vuelve a mostrar (el usuario tiene que ver el motivo); con éxito no se
-    // restaura sola (ver `finish_capture_ui`).
+    // Desde aquí la ventana principal puede estar oculta. Si algo falla se vuelve a mostrar (el
+    // usuario tiene que ver el motivo); con éxito no se restaura sola.
     let result = match acquire_photo(&env, trigger).await {
         Ok(photo) => run_capture(app, generation, photo).await,
         Err(code) => Err(code.as_str().to_string()),
     };
     if result.is_err() {
         show_main_now(app);
-        finish_capture_ui(app, CaptureOutcome::Error);
     }
     result
 }
@@ -385,7 +371,6 @@ async fn watch_idle(app: AppHandle, generation: u64) {
                 if let Some(w) = app.get_webview_window(OVERLAY_LABEL) {
                     let _ = w.destroy();
                 }
-                finish_capture_ui(&app, CaptureOutcome::IdleTimeout);
                 return;
             }
         }
@@ -446,7 +431,6 @@ async fn wait_for_overlay(app: &AppHandle) -> Result<(), String> {
                     let _ = w.destroy();
                 }
                 discard_pending(app);
-                finish_capture_ui(app, CaptureOutcome::OverlayTimeout);
                 return Err("el overlay de captura no apareció en 5 s".to_string());
             }
         }
@@ -524,9 +508,8 @@ pub(crate) fn cancel_capture_impl(pending: &Mutex<Option<PathBuf>>) {
 }
 
 #[tauri::command]
-pub fn cancel_capture<R: Runtime>(app: AppHandle<R>, state: State<'_, CaptureState>) {
+pub fn cancel_capture(state: State<'_, CaptureState>) {
     cancel_capture_impl(&state.0);
-    finish_capture_ui(&app, CaptureOutcome::Cancelled);
 }
 
 /// Crea la ventana overlay la primera vez; en capturas siguientes la

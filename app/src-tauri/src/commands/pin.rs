@@ -11,8 +11,7 @@ use tauri::{
     AppHandle, Manager, Runtime, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder, WindowEvent,
 };
 
-use super::capture_flow::{finish_capture_ui, CaptureState};
-use crate::monitors::CaptureOutcome;
+use super::capture_flow::CaptureState;
 use super::output::{raw_body, validate_png, with_pending, header_str, MAX_DIMENSION};
 
 pub const PIN_PREFIX: &str = "pin-";
@@ -125,7 +124,6 @@ pub async fn pin_capture<R: Runtime>(
             }
         }
     })?;
-    finish_capture_ui(&app, CaptureOutcome::Pinned);
     Ok(label)
 }
 
