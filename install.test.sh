@@ -10,9 +10,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(mktemp -d)"
 SERVER_PID=""
 API_PID=""
+FAKE_PIDS=()
 cleanup() {
 	[ -n "$SERVER_PID" ] && kill "$SERVER_PID" 2>/dev/null || true
 	[ -n "$API_PID" ] && kill "$API_PID" 2>/dev/null || true
+	for p in "${FAKE_PIDS[@]:-}"; do [ -n "$p" ] && kill "$p" 2>/dev/null || true; done
 	rm -rf "$ROOT"
 }
 trap cleanup EXIT
@@ -565,5 +567,114 @@ contains "$SERVICE_PATH" "Exec=$BIN_PATH --hidden"
 [ "$(basename "$BIN_PATH")" = knivchit ] || fail "el binario instalado debe llamarse knivchit"
 bash "$SCRIPT_DIR/install.sh" --uninstall >"$OUT" 2>&1 || fail "--uninstall falló"
 contains "$OUT" "flatpak permission-reset knivchit"
+
+# 21. Una app abierta no se pisa: se pide cerrarla (nunca se toca otro proceso) --------------------
+# Proceso falso de ESTA instalación: ejecutable llamado «knivchit» (así lo ve /proc/<pid>/comm) que
+# hereda APPIMAGE=<binario instalado>, igual que la app real lanzada desde el AppImage.
+start_fake_app() { # variable-de-entorno-APPIMAGE
+	mkdir -p "$E/proc"
+	cp "$(command -v sleep)" "$E/proc/knivchit"
+	APPIMAGE="$1" "$E/proc/knivchit" 300 >/dev/null 2>&1 &
+	FAKE_PID=$!
+	FAKE_PIDS+=("$FAKE_PID")
+	for _ in $(seq 1 30); do [ "$(cat "/proc/$FAKE_PID/comm" 2>/dev/null)" = knivchit ] && break; sleep 0.1; done
+}
+alive() { kill -0 "$1" 2>/dev/null; }
+
+new_env abierta-sin-permiso
+install_ok
+cmp -s "$BIN_PATH" "$E/release/knivchit_0.1.0_amd64.AppImage" || fail "preparación: el binario no es el del release"
+start_fake_app "$BIN_PATH"
+printf 'viejo' >"$BIN_PATH"
+install_fails
+contains "$OUT" "Knivchit está abierto"
+contains "$OUT" "--close-app"
+[ "$(cat "$BIN_PATH")" = viejo ] || fail "con la app abierta y sin permiso no se debe cambiar el binario"
+alive "$FAKE_PID" || fail "sin permiso no se debe cerrar la app"
+timeout 60 bash "$SCRIPT_DIR/install.sh" --uninstall >"$OUT" 2>&1 </dev/null && fail "--uninstall con la app abierta y sin permiso debería fallar"
+contains "$OUT" "Knivchit está abierto"
+present "$BIN_PATH"
+alive "$FAKE_PID" || fail "--uninstall sin permiso no debe cerrar la app"
+
+new_env abierta-con-permiso
+install_ok
+start_fake_app "$BIN_PATH"
+timeout 60 bash "$SCRIPT_DIR/install.sh" --close-app >"$OUT" 2>&1 </dev/null || fail "--close-app debería poder instalar"
+contains "$OUT" "Cerrando Knivchit"
+alive "$FAKE_PID" && fail "--close-app debía cerrar la app"
+cmp -s "$BIN_PATH" "$E/release/knivchit_0.1.0_amd64.AppImage" || fail "tras cerrarla se debe instalar el binario nuevo"
+
+new_env abierta-desinstalar
+install_ok
+start_fake_app "$BIN_PATH"
+timeout 60 bash "$SCRIPT_DIR/install.sh" --uninstall --close-app >"$OUT" 2>&1 </dev/null || fail "--uninstall --close-app falló"
+alive "$FAKE_PID" && fail "--uninstall --close-app debía cerrar la app"
+absent "$BIN_PATH"
+contains "$OUT" "knivchit desinstalado."
+
+# El ayudante del AppImage (ejecutable = el binario instalado) también se cierra
+new_env abierta-ayudante
+install_ok
+cp "$(command -v sleep)" "$BIN_PATH"
+"$BIN_PATH" 300 >/dev/null 2>&1 &
+FAKE_PID=$!
+FAKE_PIDS+=("$FAKE_PID")
+for _ in $(seq 1 30); do [ "$(cat "/proc/$FAKE_PID/comm" 2>/dev/null)" = knivchit ] && break; sleep 0.1; done
+timeout 60 bash "$SCRIPT_DIR/install.sh" --uninstall --close-app >"$OUT" 2>&1 </dev/null || fail "--uninstall --close-app con ayudante falló"
+alive "$FAKE_PID" && fail "el ayudante del AppImage debía cerrarse"
+
+# Otro «knivchit» que NO es de esta instalación (otra ruta de APPIMAGE, p. ej. la app real del usuario)
+# no se toca ni se pregunta nada: la instalación sigue normal.
+new_env ajena
+start_fake_app "/otra/ruta/knivchit"
+install_ok
+alive "$FAKE_PID" || fail "un proceso ajeno a esta instalación no debe cerrarse"
+absent "$ROOT/ajena/proc-cerrado"
+kill "$FAKE_PID" 2>/dev/null || true
+
+# Con terminal interactiva (un pty de verdad): pregunta, y «n» no cambia nada; «s» cierra y sigue
+run_in_pty() { # respuesta a la pregunta [s/N]
+	python3 - "$SCRIPT_DIR/install.sh" "$1" <<'PY'
+import os, pty, select, sys, time
+script, answer = sys.argv[1], sys.argv[2]
+pid, fd = pty.fork()
+if pid == 0:
+    os.execvp("bash", ["bash", script])
+out, sent, deadline = b"", False, time.time() + 60
+while time.time() < deadline:
+    ready, _, _ = select.select([fd], [], [], 0.2)
+    if not ready:
+        continue
+    try:
+        chunk = os.read(fd, 4096)
+    except OSError:
+        break
+    if not chunk:
+        break
+    out += chunk
+    if not sent and b"[s/N]" in out:
+        os.write(fd, (answer + "\n").encode())
+        sent = True
+sys.stdout.buffer.write(out)
+os.waitpid(pid, 0)
+PY
+}
+
+new_env interactiva-no
+install_ok
+start_fake_app "$BIN_PATH"
+printf 'viejo' >"$BIN_PATH"
+run_in_pty n >"$OUT" 2>&1 || true
+contains "$OUT" "¿Cerrarlo ahora?"
+[ "$(cat "$BIN_PATH")" = viejo ] || fail "responder «n» no debe cambiar nada"
+alive "$FAKE_PID" || fail "responder «n» no debe cerrar la app"
+
+new_env interactiva-si
+install_ok
+start_fake_app "$BIN_PATH"
+run_in_pty s >"$OUT" 2>&1 || true
+contains "$OUT" "¿Cerrarlo ahora?"
+alive "$FAKE_PID" && fail "responder «s» debía cerrar la app"
+cmp -s "$BIN_PATH" "$E/release/knivchit_0.1.0_amd64.AppImage" || fail "tras responder «s» se debe instalar"
 
 echo "PASS: install.sh verifica sha256 antes de tocar nada, instala app+servicio D-Bus+.desktop+iconos+extensión, es idempotente, avisa con claridad y --uninstall lo revierte"

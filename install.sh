@@ -20,6 +20,9 @@
 # `install.sh --uninstall` revierte todo (binario, menú, iconos, servicio D-Bus,
 # autoarranque, extensión y logs). No borra tus capturas ni la base de datos de
 # la app (~/.local/share/org.knivchit.app).
+#
+# Con Knivchit abierto no se pisa nada: en una terminal pregunta si cerrarlo y, sin ella, se
+# niega. `--close-app` lo cierra sin preguntar. Solo toca los procesos de ESTA instalación.
 set -euo pipefail
 
 KNIVCHIT_API_BASE="${KNIVCHIT_API_BASE:-https://api.github.com/repos/kevincharp/knivchit}"
@@ -81,11 +84,68 @@ remove_logs_dir() { # ruta nombre-base
 LOCAL_DIR=""
 WANT_VERSION=""
 WANT_STABLE=0
+CLOSE_APP=0
 RELEASE_IS_PRE=0
 WORK=""
 trap '[ -n "$WORK" ] && rm -rf "$WORK"' EXIT
 
+# Procesos de ESTA instalación y nada más: llamados «knivchit», del usuario actual, y cuyo ejecutable
+# es el binario instalado (el ayudante del AppImage, «helper») o que heredaron APPIMAGE=<binario> (la
+# app). Así nunca se toca otro Knivchit, p. ej. una copia de desarrollo en otra ruta. Imprime «tipo pid».
+knivchit_procs() { # [app|helper]
+	local d real kind
+	real=$(readlink -f "$BIN_PATH" 2>/dev/null || printf '%s' "$BIN_PATH")
+	for d in /proc/[0-9]*; do
+		[ -O "$d" ] || continue
+		[ "$(cat "$d/comm" 2>/dev/null)" = knivchit ] || continue
+		kind=""
+		if [ "$(readlink "$d/exe" 2>/dev/null)" = "$real" ]; then
+			kind=helper
+		elif tr '\0' '\n' <"$d/environ" 2>/dev/null | grep -xF -e "APPIMAGE=$BIN_PATH" -e "APPIMAGE=$real" >/dev/null; then
+			kind=app
+		fi
+		if [ -n "$kind" ] && { [ -z "${1:-}" ] || [ "$1" = "$kind" ]; }; then echo "$kind ${d#/proc/}"; fi
+	done
+	return 0
+}
+
+signal_procs() { # tipo señal
+	local pid
+	for pid in $(knivchit_procs "$1" | awk '{print $2}'); do kill "-$2" "$pid" 2>/dev/null || true; done
+}
+
+wait_gone() { # tipo segundos
+	local i
+	for i in $(seq 1 $(($2 * 10))); do
+		[ -z "$(knivchit_procs "$1")" ] && return 0
+		sleep 0.1
+	done
+	return 1
+}
+
+# Si Knivchit está abierto: pregunta (en una terminal) o exige --close-app, y lo cierra con SIGTERM,
+# primero la app y luego su ayudante del AppImage, que sale solo al desmontar. No usa SIGKILL.
+ensure_app_closed() {
+	[ -n "$(knivchit_procs)" ] || return 0
+	if [ "$CLOSE_APP" != 1 ]; then
+		if [ -t 0 ]; then
+			printf 'Knivchit está abierto y hay que cerrarlo para continuar. ¿Cerrarlo ahora? [s/N] ' >&2
+			local answer=""
+			read -r answer || true
+			case "$answer" in s | S | sí | si | SI | y | Y) ;; *) die "no se cambió nada: cierra Knivchit y vuelve a ejecutar el instalador." ;; esac
+		else
+			die "Knivchit está abierto: ciérralo y vuelve a ejecutar el instalador, o ejecútalo con --close-app para que lo cierre él. No se cambió nada."
+		fi
+	fi
+	echo "Cerrando Knivchit ..."
+	signal_procs app TERM
+	wait_gone app 5 || true
+	wait_gone helper 5 || { signal_procs helper TERM; wait_gone helper 5 || true; }
+	[ -z "$(knivchit_procs)" ] || die "no pude cerrar Knivchit (procesos: $(knivchit_procs | awk '{printf "%s ", $2}')). Ciérralo a mano y vuelve a ejecutar el instalador."
+}
+
 uninstall() {
+	ensure_app_closed
 	rm -f "$BIN_PATH" "$DESKTOP_PATH" "$DBUS_SERVICE_PATH" "$AUTOSTART_PATH"
 	if [ -d "$KNIVCHIT_ICON_DIR/hicolor" ]; then
 		find "$KNIVCHIT_ICON_DIR/hicolor" -path '*/apps/knivchit.*' -type f -delete
@@ -538,7 +598,8 @@ do_install() {
 	fi
 	chmod +x "$WORK/$APPIMAGE_NAME"
 
-	# A partir de aquí todo está verificado: ya se puede escribir en el sistema.
+	# A partir de aquí todo está verificado: ya se puede escribir en el sistema (con la app cerrada).
+	ensure_app_closed
 	mkdir -p "$KNIVCHIT_DATA_DIR"
 	install_binary
 	install_icons
@@ -562,13 +623,14 @@ do_install() {
 	fi
 }
 
-usage() { echo "uso: install.sh [--stable | --version <tag>] | --from-dir <carpeta> | --uninstall" >&2; exit 2; }
+usage() { echo "uso: install.sh [--close-app] [--stable | --version <tag>] | --from-dir <carpeta> | --uninstall" >&2; exit 2; }
 
 ACTION=install
 while [ $# -gt 0 ]; do
 	case "$1" in
 	--uninstall) ACTION=uninstall ;;
 	--stable) WANT_STABLE=1 ;;
+	--close-app) CLOSE_APP=1 ;;
 	--version)
 		[ -n "${2:-}" ] || usage
 		WANT_VERSION="$2"; shift ;;
@@ -592,5 +654,5 @@ fi
 case "$ACTION" in
 install) do_install ;;
 uninstall) uninstall ;;
-help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//' ;;
+help) sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//' ;;
 esac
