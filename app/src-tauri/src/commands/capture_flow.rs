@@ -146,17 +146,14 @@ pub struct CaptureState(pub Mutex<Option<PathBuf>>);
 
 pub(crate) const MAIN_LABEL: &str = "main";
 
-/// Toma una captura de pantalla completa (sin picker nativo, ver
-/// `capture::capture_full_screen`) y abre la ventana overlay donde el
-/// usuario dibuja su propia selección encima de esa foto congelada.
+/// Toma una captura de pantalla completa (sin picker nativo, ver `capture::capture_full_screen`) y
+/// abre la ventana overlay donde el usuario dibuja su propia selección sobre esa foto congelada.
 ///
-/// Oculta la ventana principal antes de capturar — si no, la foto congelada
-/// incluye a Knivchit mismo (se veía en la primera prueba real). El delay
-/// le da tiempo al compositor a repintar sin ella antes de pedir la captura.
+/// Oculta la ventana principal antes de capturar para que la foto no incluya a Knivchit; el delay
+/// da tiempo al compositor a repintar sin ella.
 ///
-/// Es una función libre (no un `#[tauri::command]`) para que tanto el botón
-/// de la UI como el atajo global disparado desde D-Bus (ver `dbus::AppService`)
-/// puedan llamarla sin pasar por el mecanismo de IPC de Tauri.
+/// Es una función libre (no un `#[tauri::command]`) para que el botón de la UI y el atajo global
+/// disparado desde D-Bus (ver `dbus::AppService`) puedan llamarla sin pasar por el IPC de Tauri.
 pub async fn trigger_capture(app: &AppHandle, trigger: Trigger) -> Result<(), String> {
     let overlay_open = app.get_webview_window(OVERLAY_LABEL).is_some();
     let (generation, number) = match app
@@ -512,17 +509,11 @@ pub fn cancel_capture(state: State<'_, CaptureState>) {
     cancel_capture_impl(&state.0);
 }
 
-/// Crea la ventana overlay la primera vez; en capturas siguientes la
-/// reutiliza (evita el costo de crear un webview nuevo cada vez). `monitor`
-/// es el índice (en `available_monitors`, que sigue el orden de GDK) donde
-/// debe ir en fullscreen.
+/// Crea la ventana overlay la primera vez y la reutiliza en las siguientes. `monitor` es el índice
+/// (en `available_monitors`, que sigue el orden de GDK) donde debe ir en fullscreen.
 ///
-/// NOTA: en la práctica no se ha visto tomar la rama `existing` — el overlay
-/// siempre termina destruido (`wait_for_overlay`/`watch_idle` lo hacen ante
-/// timeout, y los caminos de salida normales no lo reutilizan explícitamente
-/// hoy). Se deja la reutilización porque es barata y correcta si algún día sí
-/// aplica, pero no se la puede dar por ejercitada sin confirmarlo en un
-/// GNOME real.
+/// La rama `existing` no se ha visto tomar en la práctica (el overlay se destruye siempre al salir);
+/// se conserva porque es barata, pero no está ejercitada en un GNOME real.
 fn show_or_create_overlay(app: &AppHandle, monitor: Option<usize>) -> Result<(), String> {
     if let Some(existing) = app.get_webview_window(OVERLAY_LABEL) {
         fullscreen_on_monitor(app, &existing, monitor)?;

@@ -17,15 +17,11 @@ pub const WINDOW_BACKGROUND: tauri::window::Color = tauri::window::Color(5, 7, 1
 
 use tauri::Manager;
 
-/// Si hay que terminar el proceso cuando Tauri pide salir. `code` es `None`
-/// solo cuando lo disparó el cierre de la última ventana (interacción del
-/// usuario) — `Some` es un pedido explícito (`AppHandle::exit`/`restart`,
-/// como el botón «Salir de Knivchit», `quit_app`) y ahí sí debe salir. Knivchit
-/// es una app de segundo plano: cerrar "main" la DESTRUYE de verdad (ver `show_main_window` —
-/// dejar de interceptar `CloseRequested` fue a propósito, ver esa función),
-/// pero el proceso entero (servidor D-Bus `org.knivchit.App`, atajo
-/// global) nunca debe morir con ella: sin este guard, cerrar la única ventana
-/// mataba todo el proceso (comprobado en un Shell GNOME anidado).
+/// Si hay que terminar el proceso cuando Tauri pide salir. `code` es `None` solo cuando lo disparó
+/// el cierre de la última ventana; `Some` es un pedido explícito (`AppHandle::exit`/`restart`, como
+/// «Salir de Knivchit», `quit_app`) y ahí sí debe salir. Knivchit es una app de segundo plano:
+/// cerrar "main" la destruye (ver `show_main_window`), pero el proceso (servidor D-Bus
+/// `org.knivchit.App`, atajo global) no debe morir con ella.
 fn should_prevent_exit(code: Option<i32>) -> bool {
     code.is_none()
 }

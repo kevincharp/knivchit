@@ -37,17 +37,12 @@ vi.mock("@tauri-apps/api/webview", () => ({
 import { CaptureOverlay } from "./CaptureOverlay";
 
 /**
- * Enrutado de gestos por capas con «Seleccionar». La figura gana al marco del
- * área de captura; el marco solo se mueve desde su interior VACÍO y se
- * redimensiona desde sus manijas.
+ * Enrutado de gestos por capas con «Seleccionar». La figura gana al marco del área de captura; el
+ * marco solo se mueve desde su interior VACÍO y se redimensiona desde sus manijas.
  *
- * jsdom no hace hit-testing por layout: `topmostAt` lo emula con el orden de
- * apilado real del overlay (manijas del área > cuerpo del área > canvas de
- * anotaciones) y respetando `pointer-events`. Así el test vale tanto si el
- * arreglo enruta por CSS como si enruta por código.
- *
- * Los tests `bug(...)` fijaron el defecto (rojo contra 55aa4bb); ya están
- * activos tras el arreglo.
+ * jsdom no hace hit-testing por layout: `topmostAt` lo emula con el orden de apilado real del
+ * overlay (manijas del área > cuerpo del área > canvas de anotaciones) y respetando
+ * `pointer-events`. Así el test vale tanto si el enrutado es por CSS como si es por código.
  */
 const bug = it;
 

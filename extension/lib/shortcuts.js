@@ -63,17 +63,15 @@ export function reservedReason(mods, key) {
 
 /**
  * Valida y normaliza un acelerador con formato GTK (`<Super><Shift>c`).
- * Reglas: texto no vacío; modificadores entre `<>` seguidos de UNA tecla que
- * exista; la tecla no puede ser modificadora; hace falta al menos un
- * modificador distinto de Shift salvo en las teclas F (Shift+letra solo
- * teclearía mayúsculas: secuestraría la escritura).
+ * Reglas: texto no vacío; modificadores entre `<>` seguidos de UNA tecla que exista; la tecla no
+ * puede ser modificadora; hace falta al menos un modificador distinto de Shift salvo en las teclas
+ * F (Shift+letra solo teclearía mayúsculas: secuestraría la escritura).
  *
- * `isKnownKey(nombre)` decide si una tecla existe. Con `lenient` (para leer
- * atajos del sistema) se omiten las reglas de uso y la comprobación de tecla.
+ * `isKnownKey(nombre)` decide si una tecla existe. Con `lenient` (para leer atajos del sistema) se
+ * omiten las reglas de uso y la comprobación de tecla.
  *
- * Devuelve { ok: true, accel, mods, key } con `accel` normalizado (modificadores
- * canónicos en el orden escrito, sin repetir; la letra en minúscula) o
- * { ok: false, error } con el motivo legible.
+ * Devuelve { ok: true, accel, mods, key } con `accel` normalizado (modificadores canónicos en el
+ * orden escrito, sin repetir; letra en minúscula) o { ok: false, error } con el motivo legible.
  */
 export function parseAccelerator(input, isKnownKey, { lenient = false, allowReserved = false } = {}) {
   if (typeof input !== "string") return { ok: false, error: "El acelerador debe ser un texto." };

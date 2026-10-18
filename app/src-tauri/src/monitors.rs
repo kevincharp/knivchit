@@ -66,15 +66,10 @@ pub fn pick_monitor(monitors: &[MonitorGeom], cursor: Option<(f64, f64)>) -> Opt
 
 /// Rectángulo de la imagen del portal que corresponde al monitor `index`.
 ///
-/// La imagen cubre la caja envolvente de todos los monitores, con origen en
-/// su esquina mínima. Si la imagen y la caja difieren de tamaño (p. ej.
-/// escala fraccional donde Tauri reporta otras unidades que la imagen), se
-/// reescala por la razón imagen/caja en cada eje.
-///
-/// SUPOSICIÓN NO VERIFICADA: con escala distinta de 1.0 no se ha comprobado
-/// contra un GNOME real qué unidades reporta Tauri ni si la razón es
-/// uniforme entre monitores de escala mixta. Con escala 1.0 sí encaja con el
-/// caso medido en un GNOME real (1600×900 + 1280×720).
+/// La imagen cubre la caja envolvente de todos los monitores, con origen en su esquina mínima. Si
+/// difieren de tamaño (p. ej. escala fraccional), se reescala por la razón imagen/caja en cada eje.
+/// Con escala 1.0 coincide con lo medido en un GNOME real (1600×900 + 1280×720); con otras escalas
+/// y monitores de escala mixta es una suposición sin verificar.
 pub fn crop_rect_for_monitor(
     monitors: &[MonitorGeom],
     index: usize,

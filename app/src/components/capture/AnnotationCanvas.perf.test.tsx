@@ -9,21 +9,14 @@ import {
 } from "./annotations";
 
 /**
- * Pauta de rendimiento por gesto (se cuenta TRABAJO, no milisegundos: jsdom no
- * mide tiempos fiables). Origen: el texto se movía y redimensionaba a
- * tirones en WebKitGTK real y ningún test lo había visto, porque los de
- * «trabajo por frame» solo cubrían el cambio de selección y dibujar un rect.
- *
- * Para CADA figura y CADA gesto de edición (mover, y redimensionar con cada
- * clase de manija) se emiten 200 `pointermove` dentro de un solo frame y se
- * mide, antes de soltar:
+ * Pauta de rendimiento por gesto (se cuenta TRABAJO, no milisegundos: jsdom no mide tiempos fiables).
+ * Para CADA figura y CADA gesto de edición (mover, y redimensionar con cada clase de manija) se
+ * emiten 200 `pointermove` dentro de un solo frame y se mide, antes de soltar:
  *   - redibujados del canvas (pasadas de `clearRect`) tras vaciar el frame,
  *   - llamadas a `getBoundingClientRect` (layout síncrono) durante el gesto,
  *   - commits de React del subárbol (Profiler).
- * Medición de partida (200 eventos): todas las figuras daban 1 redibujado, 0
- * layouts y 201 commits (un render de React por evento, en TODAS las figuras; en
- * el texto ese render es más caro). Tras coalescer el borrador por frame: ≤ 10. Los presupuestos son por 200 eventos y valen para cualquier figura nueva:
- * basta añadirla a FIGURAS.
+ * El borrador se coalesce por frame: ≤ 10 commits por 200 eventos (sin coalescer eran 201). Los
+ * presupuestos valen para cualquier figura nueva: basta añadirla a FIGURAS.
  */
 const SELECTION = { x: 200, y: 100, w: 400, h: 300 };
 const SCALE = { x: 0.5, y: 0.5 };
