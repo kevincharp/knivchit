@@ -31,6 +31,23 @@ Versión **v0.1: solo el capturador**. Es lo único que existe y está probado.
 
 Probado en **GNOME 50 sobre Wayland**. La extensión declara compatibilidad solo con GNOME 50.
 
+## ¿Por qué otra herramienta de capturas?
+
+Hay buenas herramientas de captura para Linux, y Knivchit no dice hacer algo que ellas no puedan.
+
+- **Flameshot** es madura, muy usada y funciona en GNOME.
+- **Waytator** añade edición de video y OCR, y apunta primero a compositores wlroots.
+- **Spectacle** es la de KDE.
+
+Knivchit es una apuesta más pequeña:
+
+- **GNOME primero:** una extensión del Shell se ocupa del atajo global y de colocar las ventanas, porque Wayland no deja que una app lo haga sola.
+- **Una sola app para las herramientas pequeñas alrededor de una captura:** hoy captura y anota; el historial del portapapeles, un selector de emojis, OCR y traducción están planeados, sin fechas.
+- **Local por diseño:** sin cuentas ni telemetría; su única petición de red es el botón opcional de «buscar actualizaciones».
+- **Un diseño moderno como objetivo,** no solo una lista de funciones.
+
+Es una alpha: si alguna de las anteriores ya hace lo que necesitas, úsala. Lo que esta sección dice de otras herramientas sale de sus README a octubre de 2026; avísanos si algo quedó desactualizado.
+
 ## Requisitos
 
 - GNOME Shell sobre **Wayland** (no se ha probado X11 ni otros escritorios).

@@ -30,6 +30,23 @@ Version 0.1 does one thing: screenshots.
 
 "Coming soon" means planned, with no dates. Tested on **GNOME 50 on Wayland**; the extension declares support for GNOME 50 only. The app's interface is in Spanish for now; an English interface is planned.
 
+## Why another screenshot tool?
+
+There are good screenshot tools for Linux, and Knivchit does not claim to do something they can't.
+
+- **Flameshot** is mature, widely used and works on GNOME.
+- **Waytator** adds video editing and OCR, and is aimed first at wlroots compositors.
+- **Spectacle** is KDE's.
+
+Knivchit is a smaller bet:
+
+- **GNOME first:** a Shell extension handles the global shortcut and window placement, because Wayland doesn't let an app do it on its own.
+- **One app for the small tools around a screenshot:** today it captures and annotates; clipboard history, an emoji picker, OCR and translation are planned, with no dates.
+- **Local by design:** no accounts, no telemetry; its only network request is the optional "check for updates" button.
+- **A modern look as a goal,** not just a feature list.
+
+It is an early alpha: if one of the tools above already does what you need, use it. What this section says about other tools comes from their READMEs as of October 2026; tell us if something is out of date.
+
 ## Requirements
 
 - GNOME Shell on **Wayland** (X11 and other desktops are untested).
