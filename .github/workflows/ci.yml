@@ -60,6 +60,10 @@ jobs:
       - name: Lint
         run: cd app && pnpm exec biome check .
 
+      # Comentarios cortos y sin historia (regla 8 de las instrucciones del proyecto).
+      - name: Comentarios
+        run: node scripts/check-comments.mjs && node --test scripts/check-comments.test.mjs
+
       - name: Tests Rust
         run: cargo test --manifest-path app/src-tauri/Cargo.toml
 
