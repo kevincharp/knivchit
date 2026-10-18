@@ -30,31 +30,16 @@ fn should_prevent_exit(code: Option<i32>) -> bool {
     code.is_none()
 }
 
-/// Única vía para mostrar "main": si existe, la muestra y enfoca; si no
-/// (porque el usuario la cerró), la RECREA desde cero con exactamente la misma
-/// config de `tauri.conf.json` (`WebviewWindowBuilder::from_config`, nunca
-/// números repetidos a mano) y la muestra. Se usa en el arranque (salvo con
-/// `--hidden`), en "Abrir Knivchit" de la bandeja y en el método D-Bus
-/// `ShowMain` — NUNCA desde el flujo de captura (decisión de producto: es solo
-/// la ventana de ajustes, no debe reaparecer sola por una captura).
+/// Única vía para mostrar "main": si existe la muestra y enfoca; si el usuario la cerró, la RECREA
+/// desde `tauri.conf.json` (`WebviewWindowBuilder::from_config`) y la muestra. Se usa al arrancar
+/// (salvo con `--hidden`), en "Abrir Knivchit" de la bandeja y en el método D-Bus `ShowMain`;
+/// nunca desde el flujo de captura.
 ///
-/// "main" se declara con `decorations: false` (sin bordes: el usuario no puede
-/// redimensionarla a mano) y proporción de teléfono: ancho fijo 480 y alto
-/// entre 480 y 720, inicial 720 (`resizable: true` con `min/maxWidth` iguales).
-/// La app NO consulta monitores para decidir el alto: bajo Wayland GDK no tiene
-/// monitor primario (`get_primary_monitor()` es null, `is_primary()` false), así
-/// que `primary_monitor()` da `None`, y con la ventana de tamaño fijo Mutter no
-/// deja que nadie la encoja después. La extensión sí conoce el primario real
-/// del Shell: coloca la ventana a la derecha y recorta su alto al área útil
-/// (`move_resize_frame`), por eso el alto es un rango y no un valor.
-///
-/// Se quitó la decoración nativa porque el ✕ de la cabecera GTK bajo Wayland no
-/// respondía hasta que la ventana pasaba por un `configure` negociado con
-/// Mutter, y tres workarounds (resize sintético, tamaño por GTK, destruir y
-/// recrear) fallaron en la verificación real. Cerrar "main" la destruye de
-/// verdad; el proceso sigue vivo gracias a `should_prevent_exit`. Arranca con
-/// `create: false` (no existe hasta la primera vez que se muestra) para poder
-/// respetar `--hidden` y aplicarle el filtro de navegación.
+/// Sin decoración nativa (bajo Wayland su ✕ no respondía), ancho fijo 480 y alto entre 480 y 720: la
+/// app no consulta monitores (Wayland no tiene monitor primario) y es la extensión quien coloca la
+/// ventana y recorta su alto al área útil. Cerrar "main" la destruye; el proceso sigue vivo por
+/// `should_prevent_exit`. Se crea con `create: false` para respetar `--hidden` y aplicarle el filtro
+/// de navegación.
 pub(crate) fn show_main_window<R: tauri::Runtime, M: tauri::Manager<R>>(
     app: &M,
 ) -> tauri::Result<()> {

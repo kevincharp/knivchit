@@ -277,10 +277,9 @@ fn save_capture_impl(
         .map(|p| p.to_string_lossy().into_owned())
 }
 
-/// Guarda en la carpeta CONFIGURADA (`Settings.screenshot_save_dir`), nunca en
-/// una que mande el webview: así un webview comprometido no puede escribir en
-/// una ruta arbitraria. El frontend ya no manda el header `x-save-dir`; si
-/// llegara, se ignora.
+/// Guarda en la carpeta CONFIGURADA (`Settings.screenshot_save_dir`), nunca en una que mande el
+/// webview: así un webview comprometido no puede escribir en una ruta arbitraria. Cualquier
+/// header de carpeta que llegue en la petición se ignora.
 #[tauri::command]
 pub async fn save_capture<R: Runtime>(
     app: AppHandle<R>,

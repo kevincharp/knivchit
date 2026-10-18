@@ -149,9 +149,6 @@ export default class KnivchitExtension extends Extension {
       this._activateOverlay(win),
     );
     for (const actor of global.get_window_actors()) this._watchWindow(actor.meta_window);
-
-    // TODO (más adelante, dentro de esta misma épica): St.Clipboard.get_default()
-    // en un polling o signal de cambio real, llamando this._service.notifyChange(entry).
   }
 
   // El título puede fijarse después de crear la ventana, y el marco no tiene

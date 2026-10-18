@@ -178,14 +178,11 @@ function drawMosaic(
 }
 
 /**
- * Recorta `selection` desde la imagen original a resolución nativa y dibuja
- * encima las anotaciones. Solo para la composición final (ver
- * `composeCapture`): el `drawImage` del recorte completo es exactamente la
- * operación que se sospecha dispara el artefacto de composición de
- * WebKitGTK (fondo negro + una copia de la pantalla desplazada) cuando corre
- * en el canvas visible del DOM durante la edición — por eso la vista previa
- * en vivo usa `renderAnnotationsOnly`, no esta función, y esta solo se llama
- * sobre un canvas nunca insertado en el DOM.
+ * Recorta `selection` de la imagen original a resolución nativa y dibuja encima las anotaciones.
+ * Solo para la composición final (`composeCapture`) y sobre un canvas fuera del DOM: este
+ * `drawImage` del recorte completo en el canvas visible produjo un artefacto de WebKitGTK (fondo
+ * negro y una copia desplazada de la pantalla; causa no confirmada). La vista previa usa
+ * `renderAnnotationsOnly`.
  */
 export function renderSelection(
 	canvas: HTMLCanvasElement,
@@ -216,14 +213,10 @@ export function renderSelection(
 }
 
 /**
- * Pinta solo las anotaciones sobre un canvas transparente — para la vista
- * previa en vivo (`AnnotationCanvas`). El recorte de fondo no se dibuja acá:
- * ya se ve a través del hueco que `SelectionFrame` recorta en la máscara
- * (mismo origen y escala que esta selección), así que duplicarlo con un
- * `drawImage` del recorte completo en cada frame sería redundante — y es
- * justo esa operación la que se sospecha dispara el artefacto de composición
- * de WebKitGTK en el canvas acelerado visible (ver `renderSelection`).
- * `drawMosaic` sigue necesitando `image` para muestrear el píxel real.
+ * Pinta solo las anotaciones sobre un canvas transparente, para la vista previa en vivo
+ * (`AnnotationCanvas`). El recorte de fondo no se dibuja aquí: ya se ve a través del hueco que
+ * `SelectionFrame` abre en la máscara (ver `renderSelection` sobre por qué no se repite el
+ * `drawImage`). `drawMosaic` sigue necesitando `image` para muestrear el píxel real.
  */
 export function renderAnnotationsOnly(
 	canvas: HTMLCanvasElement,

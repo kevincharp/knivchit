@@ -172,8 +172,7 @@ pub fn encode_uri_component(s: &str) -> String {
 }
 
 /// Pool en memoria con el esquema real. `save_capture` lee la carpeta de
-/// `Settings.screenshot_save_dir` (ya no del header `x-save-dir`), así que los
-/// tests de IPC la manejan con `set_save_dir`.
+/// `Settings.screenshot_save_dir`, así que los tests de IPC la manejan con `set_save_dir`.
 pub fn memory_pool() -> sqlx::SqlitePool {
     tauri::async_runtime::block_on(async {
         let pool = sqlx::sqlite::SqlitePoolOptions::new()
