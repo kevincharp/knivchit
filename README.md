@@ -111,6 +111,12 @@ Two pieces with different stacks, on purpose:
 
 They talk over D-Bus. More in [`docs/architecture.md`](docs/architecture.md).
 
+## AI notice
+
+Knivchit is built by a human maintainer who uses AI coding assistants as a development tool. The maintainer decides what gets built, tests each release by hand and is responsible for what ships. The app itself contains no AI and makes no requests to AI services; its only network request is the optional "check for updates" button, which asks the GitHub API.
+
+Bug reports and pull requests are welcome whether or not AI tools were involved, and everything merged is reviewed by the maintainer. See [About using AI](CONTRIBUTING.md#about-using-ai).
+
 ## Contributing
 
 Knivchit is issues-first: open an issue with the bug or feature template. Pull requests are accepted only against an issue the maintainer has approved, or for very small fixes. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`docs/branches.md`](docs/branches.md) and the [code of conduct](CODE_OF_CONDUCT.md). Report vulnerabilities privately: [`SECURITY.md`](SECURITY.md).

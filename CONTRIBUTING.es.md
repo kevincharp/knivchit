@@ -40,7 +40,7 @@ pnpm exec tsc --noEmit && pnpm exec biome check . \
 
 ### Sobre el uso de IA
 
-Puedes usarla. Pero quien envía el PR debe **entender y haber probado** lo que envía, y poder defenderlo en la revisión. Un PR generado sin revisar se cierra.
+Puedes usarla; este proyecto también se construye con ayuda de IA (mira el [aviso sobre IA](README.es.md#aviso-sobre-ia)). Quien envía el PR es responsable de lo que hace: debe **entender y haber probado** lo que envía, y poder defenderlo en la revisión. Un PR generado sin revisar se cierra. Todo lo que se fusiona recibe la misma revisión del mantenedor, se haya usado IA o no.
 
 ## Montar el entorno
 

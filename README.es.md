@@ -99,6 +99,12 @@ Dos piezas con stacks distintos, a propósito:
 
 Se hablan por D-Bus. Más detalle en [`docs/architecture.es.md`](docs/architecture.es.md).
 
+## Aviso sobre IA
+
+Knivchit lo construye un mantenedor humano que usa asistentes de IA para programar como herramienta de desarrollo. El mantenedor decide qué se construye, prueba cada versión a mano y se hace responsable de lo que se publica. La aplicación en sí no contiene IA ni hace peticiones a servicios de IA; su única petición de red es el botón opcional de «buscar actualizaciones», que consulta la API de GitHub.
+
+Los informes de errores y los PR son bienvenidos hayan usado o no herramientas de IA, y todo lo que se fusiona lo revisa el mantenedor. Mira [Sobre el uso de IA](CONTRIBUTING.es.md#sobre-el-uso-de-ia).
+
 ## Contribuir
 
 Lee [`CONTRIBUTING.es.md`](CONTRIBUTING.es.md), el flujo de ramas en [`docs/branches.es.md`](docs/branches.es.md) y el [código de conducta](CODE_OF_CONDUCT.es.md). Vulnerabilidades: [`SECURITY.es.md`](SECURITY.es.md), nunca en un issue público.

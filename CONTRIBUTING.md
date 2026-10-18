@@ -40,7 +40,7 @@ pnpm exec tsc --noEmit && pnpm exec biome check . \
 
 ### About using AI
 
-You may use it. But whoever sends the PR must **understand and have tested** what they send, and be able to defend it in review. A PR generated without review is closed.
+You may use it; this project is built with AI assistance too (see the [AI notice](README.md#ai-notice)). Whoever sends the PR is responsible for what it does: they must **understand and have tested** what they send, and be able to defend it in review. A PR generated without review is closed. Everything merged gets the same review by the maintainer, whether or not AI was used.
 
 ## Set up the environment
 
