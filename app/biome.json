@@ -7,7 +7,12 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!app-icon.svg", "!public/knivchit.svg"]
+		"includes": [
+			"**",
+			"!app-icon.svg",
+			"!public/knivchit.svg",
+			"!src/lib/emoji/emoji-data.json"
+		]
 	},
 	"formatter": {
 		"enabled": true,

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ldml>
+	<annotations>
+		<annotation cp="👨‍👩‍👧‍👦">familia | niño</annotation>
+		<annotation cp="👨‍👩‍👧‍👦" type="tts">familia: hombre, mujer, niña y niño</annotation>
+		<annotation cp="🇦🇷">Bandera</annotation>
+		<annotation cp="🇦🇷" type="tts">Bandera: Argentina</annotation>
+	</annotations>
+</ldml>

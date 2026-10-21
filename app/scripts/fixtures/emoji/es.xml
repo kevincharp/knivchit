@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ldml>
+	<annotations>
+		<annotation cp="😀">cara | feliz | sonrisa</annotation>
+		<annotation cp="😀" type="tts">cara sonriendo</annotation>
+		<annotation cp="👍">bien | pulgar | &quot;ok&quot;</annotation>
+		<annotation cp="👍" type="tts">pulgar hacia arriba</annotation>
+		<annotation cp="❤">corazón | emoción | rojo</annotation>
+		<annotation cp="❤" type="tts">corazón rojo</annotation>
+	</annotations>
+</ldml>
