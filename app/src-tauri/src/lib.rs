@@ -213,6 +213,9 @@ pub fn run() {
             app.manage(commands::capture_flow::CaptureState::default());
             app.manage(commands::pin::PinState::default());
             app.manage(commands::picker::PickerState::default());
+            app.manage(commands::picker::EmojiSet::from_json(include_str!(
+                "../../src/lib/emoji/emoji-data.json"
+            ))?);
             commands::picker::spawn_idle_watch(app.handle().clone());
             app.manage(commands::capture_flow::CaptureActivity::default());
             app.manage(capture_permission::CapturePermission::new(&data_dir));
