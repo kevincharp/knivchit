@@ -255,10 +255,23 @@ pub fn run() {
                         });
                     })
                 };
+                let on_show_picker: std::sync::Arc<dyn Fn(String) + Send + Sync> = {
+                    let app_handle = app_handle.clone();
+                    std::sync::Arc::new(move |tab| {
+                        // la creación de ventanas se hace en el hilo principal
+                        let picker_handle = app_handle.clone();
+                        let _ = app_handle.run_on_main_thread(move || {
+                            if let Err(e) = commands::picker::show_picker(&picker_handle, &tab) {
+                                eprintln!("knivchit: no se pudo mostrar el panel: {e}");
+                            }
+                        });
+                    })
+                };
                 let service = dbus::AppService {
                     visible: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
                     on_start_capture,
                     on_show_main,
+                    on_show_picker,
                     trust: dbus::CallerTrust::enforced_for_this_process(),
                 };
                 let cap_count = db::get_settings(&pool)

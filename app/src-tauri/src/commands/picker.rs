@@ -14,7 +14,6 @@ use tauri::{
 pub const PICKER_LABEL: &str = "picker";
 pub const PICKER_TITLE: &str = "knivchit-picker";
 const PICKER_SIZE: (f64, f64) = (320.0, 400.0);
-const TABS: [&str; 2] = ["emoji", "clipboard"];
 
 /// Sin teclas ni clics en el panel durante este tiempo, se cierra.
 pub const PICKER_IDLE_LIMIT_MS: u64 = 120_000;
@@ -257,7 +256,7 @@ pub async fn pick_emoji<R: Runtime>(
 
 #[tauri::command]
 pub fn open_picker<R: Runtime>(app: AppHandle<R>, tab: String) -> Result<(), String> {
-    if !TABS.contains(&tab.as_str()) {
+    if !crate::dbus::PICKER_TABS.contains(&tab.as_str()) {
         return Err(format!("pestaña no válida: {tab}"));
     }
     show_picker(&app, &tab).map_err(|e| e.to_string())

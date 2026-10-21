@@ -14,6 +14,7 @@ async fn toggle_popup_flips_visibility_state() {
         visible: visible.clone(),
         on_start_capture: Arc::new(|| {}),
         on_show_main: Arc::new(|| {}),
+        on_show_picker: Arc::new(|_| {}),
         trust: CallerTrust::AllowAny,
     };
 
@@ -62,6 +63,7 @@ async fn start_capture_dbus_method_invokes_the_callback() {
         visible: Arc::new(AtomicBool::new(false)),
         on_start_capture: Arc::new(move || called_clone.store(true, Ordering::SeqCst)),
         on_show_main: Arc::new(|| {}),
+        on_show_picker: Arc::new(|_| {}),
         trust: CallerTrust::AllowAny,
     };
 
@@ -102,6 +104,7 @@ async fn show_main_dbus_method_invokes_the_callback() {
         visible: Arc::new(AtomicBool::new(false)),
         on_start_capture: Arc::new(|| {}),
         on_show_main: Arc::new(move || called_clone.store(true, Ordering::SeqCst)),
+        on_show_picker: Arc::new(|_| {}),
         trust: CallerTrust::AllowAny,
     };
 
@@ -150,6 +153,7 @@ async fn enforced_proxy(
         visible: Arc::new(AtomicBool::new(false)),
         on_start_capture: Arc::new(move || c1.store(true, Ordering::SeqCst)),
         on_show_main: Arc::new(move || c2.store(true, Ordering::SeqCst)),
+        on_show_picker: Arc::new(|_| {}),
         trust,
     };
     let server_conn = bus.connect().await;
@@ -214,4 +218,63 @@ async fn enforced_allows_show_main_from_the_same_user_and_binary() {
 
     proxy.call_method("ShowMain", &()).await.unwrap();
     assert!(called.load(Ordering::SeqCst));
+}
+
+// ------------------------------------------------------------ ShowPicker
+
+type PickerTabs = Arc<std::sync::Mutex<Vec<String>>>;
+
+async fn picker_proxy(bus: &PrivateBus, name: &str, trust: CallerTrust) -> (zbus::Proxy<'static>, PickerTabs) {
+    let tabs = PickerTabs::default();
+    let sink = tabs.clone();
+    let service = AppService {
+        visible: Arc::new(AtomicBool::new(false)),
+        on_start_capture: Arc::new(|| {}),
+        on_show_main: Arc::new(|| {}),
+        on_show_picker: Arc::new(move |tab| sink.lock().unwrap().push(tab)),
+        trust,
+    };
+    let server_conn = bus.connect().await;
+    server_conn.object_server().at("/org/knivchit/App", service).await.unwrap();
+    server_conn.request_name(name.to_string()).await.unwrap();
+    std::mem::forget(server_conn);
+    let client_conn = bus.connect().await;
+    let proxy = zbus::Proxy::new(&client_conn, name.to_string(), "/org/knivchit/App", "org.knivchit.App")
+        .await
+        .unwrap();
+    (proxy, tabs)
+}
+
+#[tokio::test]
+async fn show_picker_passes_a_known_tab_to_the_callback() {
+    let bus = PrivateBus::spawn();
+    let (proxy, tabs) = picker_proxy(&bus, "org.knivchit.App.PickerTab", CallerTrust::AllowAny).await;
+
+    proxy.call_method("ShowPicker", &("emoji",)).await.unwrap();
+    proxy.call_method("ShowPicker", &("clipboard",)).await.unwrap();
+    assert_eq!(*tabs.lock().unwrap(), ["emoji", "clipboard"]);
+}
+
+#[tokio::test]
+async fn show_picker_rejects_an_unknown_tab_without_calling_back() {
+    let bus = PrivateBus::spawn();
+    let (proxy, tabs) = picker_proxy(&bus, "org.knivchit.App.PickerBadTab", CallerTrust::AllowAny).await;
+
+    for bad in ["otra", "", "Emoji", "emoji\n"] {
+        let err = proxy.call_method("ShowPicker", &(bad,)).await.unwrap_err();
+        assert!(err.to_string().contains("InvalidArgs"), "{bad:?}: {err}");
+    }
+    assert!(tabs.lock().unwrap().is_empty());
+}
+
+#[tokio::test]
+async fn enforced_denies_show_picker_from_a_process_that_is_not_gnome_shell() {
+    let bus = PrivateBus::spawn();
+    let (my_uid, _) = this_process();
+    let trust = CallerTrust::Enforced { my_uid, my_exe_name: "knivchit".into() };
+    let (proxy, tabs) = picker_proxy(&bus, "org.knivchit.App.PickerDeny", trust).await;
+
+    let err = proxy.call_method("ShowPicker", &("emoji",)).await.unwrap_err();
+    assert!(err.to_string().contains("AccessDenied"), "{err}");
+    assert!(tabs.lock().unwrap().is_empty());
 }

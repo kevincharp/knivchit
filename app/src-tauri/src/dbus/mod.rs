@@ -23,7 +23,9 @@ pub struct AppService {
     /// Callback de `ShowMain`: igual que `on_start_capture`, opaco a propósito
     /// para no acoplar `AppService` a tipos de Tauri.
     pub on_show_main: Arc<dyn Fn() + Send + Sync>,
-    /// Quién puede llamar a `StartCapture` y `ShowMain`.
+    /// Callback de `ShowPicker`; recibe la pestaña ya validada.
+    pub on_show_picker: Arc<dyn Fn(String) + Send + Sync>,
+    /// Quién puede llamar a `StartCapture`, `ShowMain` y `ShowPicker`.
     pub trust: CallerTrust,
 }
 
@@ -76,6 +78,10 @@ pub struct Callers {
 
 /// `StartCapture`: solo la extensión (atajo global).
 pub const START_CAPTURE_CALLERS: Callers = Callers { shell: true, own_binary: false };
+/// `ShowPicker`: solo la extensión (atajo del panel).
+pub const SHOW_PICKER_CALLERS: Callers = Callers { shell: true, own_binary: false };
+/// Pestañas que puede pedir `ShowPicker`.
+pub const PICKER_TABS: [&str; 2] = ["emoji", "clipboard"];
 /// `ShowMain`: la extensión (clic en el icono de la barra superior) y una
 /// segunda instancia de Knivchit (instancia única).
 pub const SHOW_MAIN_CALLERS: Callers = Callers { shell: true, own_binary: true };
@@ -198,6 +204,22 @@ impl AppService {
     ) -> fdo::Result<()> {
         authorize(&self.trust, connection, &header, SHOW_MAIN_CALLERS, "ShowMain").await?;
         (self.on_show_main)();
+        Ok(())
+    }
+
+    /// Lo llama la extensión al pulsar el atajo del panel flotante; `tab` es
+    /// `emoji` o `clipboard`.
+    async fn show_picker(
+        &self,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &Connection,
+        tab: String,
+    ) -> fdo::Result<()> {
+        authorize(&self.trust, connection, &header, SHOW_PICKER_CALLERS, "ShowPicker").await?;
+        if !PICKER_TABS.contains(&tab.as_str()) {
+            return Err(fdo::Error::InvalidArgs("ShowPicker: pestaña desconocida".to_string()));
+        }
+        (self.on_show_picker)(tab);
         Ok(())
     }
 }

@@ -133,7 +133,7 @@ async fn invalid_input_never_reaches_the_extension() {
     let client = bus.connect().await;
 
     for (action, accel) in [
-        ("emoji", "<Super>e"),
+        ("clipboard", "<Super>v"),
         ("capture", "c"),
         ("capture", "<Super>c\n"),
         ("capture", "<Nope>c"),
@@ -144,4 +144,18 @@ async fn invalid_input_never_reaches_the_extension() {
     assert!(check_conflicts_on(&client, "").await.is_err());
     assert!(check_conflicts_on(&client, "x").await.is_err());
     assert!(state.lock().unwrap().set_calls.is_empty());
+}
+
+#[tokio::test]
+async fn the_emoji_action_is_accepted_and_clipboard_is_not() {
+    let bus = PrivateBus::spawn();
+    let (_ext, state) = start_fake(&bus).await;
+    let client = bus.connect().await;
+
+    assert!(set_shortcut_on(&client, "emoji", "<Super>period").await.is_ok());
+    assert_eq!(
+        state.lock().unwrap().set_calls,
+        [("emoji".to_string(), "<Super>period".to_string())]
+    );
+    assert!(set_shortcut_on(&client, "clipboard", "<Super>v").await.is_err());
 }

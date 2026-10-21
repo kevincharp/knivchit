@@ -98,16 +98,18 @@ trait ExtensionShortcuts {
 }
 
 /// Acciones a las que se puede asignar un atajo (lista cerrada). Hoy solo
-/// «capture»; el panel de emojis y el de portapapeles se añadirán aquí.
+/// «capture» y «emoji»; el atajo del portapapeles se añadirá aquí.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ShortcutAction {
     Capture,
+    Emoji,
 }
 
 impl ShortcutAction {
     pub fn parse(raw: &str) -> Result<Self, String> {
         match raw {
             "capture" => Ok(Self::Capture),
+            "emoji" => Ok(Self::Emoji),
             _ => Err("acción de atajo desconocida".to_string()),
         }
     }
@@ -116,6 +118,7 @@ impl ShortcutAction {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Capture => "capture",
+            Self::Emoji => "emoji",
         }
     }
 }
@@ -480,7 +483,9 @@ mod tests {
     fn only_known_actions_parse() {
         assert_eq!(ShortcutAction::parse("capture"), Ok(ShortcutAction::Capture));
         assert_eq!(ShortcutAction::Capture.as_str(), "capture");
-        for bad in ["", "Capture", "capture ", "emoji", "../capture", "capture\n"] {
+        assert_eq!(ShortcutAction::parse("emoji"), Ok(ShortcutAction::Emoji));
+        assert_eq!(ShortcutAction::Emoji.as_str(), "emoji");
+        for bad in ["", "Capture", "capture ", "clipboard", "Emoji", "../capture", "capture\n"] {
             assert!(ShortcutAction::parse(bad).is_err(), "{bad:?}");
         }
     }
@@ -567,10 +572,14 @@ mod tests {
         let raw = HashMap::from([
             ("capture".to_string(), "<Super>c".to_string()),
             ("emoji".to_string(), "<Super>e".to_string()),
+            ("clipboard".to_string(), "<Super>v".to_string()),
         ]);
         assert_eq!(
             known_shortcuts(raw),
-            HashMap::from([("capture".to_string(), "<Super>c".to_string())])
+            HashMap::from([
+                ("capture".to_string(), "<Super>c".to_string()),
+                ("emoji".to_string(), "<Super>e".to_string()),
+            ])
         );
     }
 
