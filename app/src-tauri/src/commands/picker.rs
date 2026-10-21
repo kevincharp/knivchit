@@ -81,12 +81,18 @@ fn announce_tab<R: Runtime>(window: &WebviewWindow<R>, tab: &str) {
     let _ = window.emit_to(PICKER_LABEL, "picker://show", serde_json::json!({ "tab": tab }));
 }
 
-fn create_picker<R: Runtime, M: Manager<R>>(app: &M) -> tauri::Result<()> {
+/// La pestaña inicial va en la URL: un evento al terminar de cargar podría
+/// llegar antes de que el panel escuche.
+pub fn picker_url(tab: &str) -> String {
+    format!("index.html?window=picker&tab={tab}")
+}
+
+fn create_picker<R: Runtime, M: Manager<R>>(app: &M, tab: &str) -> tauri::Result<()> {
     // Nace oculta: se muestra al terminar de cargar para no enseñar el webview en blanco.
     WebviewWindowBuilder::new(
         app,
         PICKER_LABEL,
-        WebviewUrl::App("index.html?window=picker".into()),
+        WebviewUrl::App(picker_url(tab).into()),
     )
     .title(PICKER_TITLE)
     .inner_size(PICKER_SIZE.0, PICKER_SIZE.1)
@@ -96,13 +102,9 @@ fn create_picker<R: Runtime, M: Manager<R>>(app: &M) -> tauri::Result<()> {
     .resizable(false)
     .visible(false)
     .on_navigation(crate::navigation::allow_navigation)
-    .on_page_load(move |window, payload| {
+    .on_page_load(|window, payload| {
         if matches!(payload.event(), tauri::webview::PageLoadEvent::Finished) {
             let _ = window.show();
-            // La pestaña vigente, no la del pedido: pudo cambiar mientras cargaba.
-            if let Some(tab) = window.state::<PickerState>().current_tab() {
-                announce_tab(&window, &tab);
-            }
         }
     })
     .build()?
@@ -137,7 +139,7 @@ pub fn show_picker<R: Runtime, M: Manager<R>>(app: &M, tab: &str) -> tauri::Resu
         }
         _ => {
             state.set_tab(Some(tab));
-            create_picker(app)
+            create_picker(app, tab)
         }
     }
 }
@@ -310,6 +312,12 @@ mod tests {
     fn the_outcome_serializes_in_lowercase() {
         assert_eq!(serde_json::to_string(&PickOutcome::Copied).unwrap(), "\"copied\"");
         assert_eq!(serde_json::to_string(&PickOutcome::Inserted).unwrap(), "\"inserted\"");
+    }
+
+    #[test]
+    fn the_initial_tab_travels_in_the_url() {
+        assert_eq!(picker_url("emoji"), "index.html?window=picker&tab=emoji");
+        assert_eq!(picker_url("clipboard"), "index.html?window=picker&tab=clipboard");
     }
 
     #[test]
