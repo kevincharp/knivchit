@@ -13,7 +13,8 @@ import { authorizeBusCaller, ClipboardService, requestServiceName, SERVICE_BUS_N
 import { ShortcutRecorder } from "./lib/shortcutRecorder.js";
 import { isModifierKeysym, parseAccelerator, ShortcutManager } from "./lib/shortcuts.js";
 import { readSystemBindings } from "./lib/systemBindings.js";
-import { isCaptureOverlayTitle, isMainWindowTitle, isOwnedByApp, isPinWindowTitle } from "./lib/windowMatch.js";
+import { placePicker } from "./lib/pickerPlacement.js";
+import { isCaptureOverlayTitle, isMainWindowTitle, isOwnedByApp, isPickerWindowTitle, isPinWindowTitle } from "./lib/windowMatch.js";
 import { placeMainWindow } from "./lib/windowPlacement.js";
 
 // Glue del Shell. Este archivo (y solo este) puede importar gi://Shell,
@@ -24,6 +25,12 @@ import { placeMainWindow } from "./lib/windowPlacement.js";
 // Cuánto se vigila la posición de una ventana X11 recién colocada.
 const HOLD_PLACEMENT_MS = 1500;
 const CAPTURE_KEYBINDING_NAME = "knivchit-start-capture";
+const EMOJI_KEYBINDING_NAME = "knivchit-open-emoji";
+// Un atajo mantenido pulsado no debe abrir y cerrar el panel en bucle.
+const PICKER_COOLDOWN_MS = 250;
+// Cuánto vale el puntero/cursor anotado al pulsar el atajo: la ventana nace después y
+// para entonces el foco ya es suyo.
+const PICKER_CONTEXT_MS = 5000;
 
 export default class KnivchitExtension extends Extension {
   enable() {
@@ -109,6 +116,25 @@ export default class KnivchitExtension extends Extension {
       () => this._startCapture(),
     );
 
+    Main.wm.addKeybinding(
+      EMOJI_KEYBINDING_NAME,
+      this._settings,
+      Meta.KeyBindingFlags.NONE,
+      Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+      () => this._openPicker("emoji"),
+    );
+    // Main.inputMethod solo avisa del rectángulo del cursor de texto por señal.
+    this._caret = null;
+    this._caretId = Main.inputMethod.connect("cursor-location-changed", (_im, rect) => {
+      this._caret = { x: rect.get_x(), y: rect.get_y(), width: rect.get_width(), height: rect.get_height() };
+    });
+    this._picker = null;
+    this._pickerContext = null;
+    this._lastPickerOpen = 0;
+    this._sessionUpdatedId = Main.sessionMode.connect("updated", () => {
+      if (Main.sessionMode.isLocked) this._closePicker();
+    });
+
     // GNOME ignora always_on_top de las apps Wayland: la extensión, que ya es
     // compositor, mantiene encima las ventanas pin. Solo mira títulos; no
     // sabe qué contienen ni habla con la app.
@@ -123,7 +149,11 @@ export default class KnivchitExtension extends Extension {
     this._unwatchApp = watchAppProcess(Gio.DBus.session, (pid) => {
       this._appPid = pid;
       this._panelIcon?.setAppRunning(pid !== null); // el icono solo existe con la app en marcha
-      if (pid !== null) for (const win of [...(this._titleHandlers?.keys() ?? [])]) this._placeMainWindow(win);
+      if (pid !== null)
+        for (const win of [...(this._titleHandlers?.keys() ?? [])]) {
+          this._placeMainWindow(win);
+          this._placePicker(win);
+        }
     });
     // Sin animación de mapeo/cierre/minimizado para el overlay de captura (y solo para él, por
     // título exacto). WindowManager consulta _shouldAnimateActor antes de cada animación; el
@@ -159,12 +189,17 @@ export default class KnivchitExtension extends Extension {
     const check = () => {
       if (isPinWindowTitle(win.get_title()) && !win.is_above()) win.make_above();
       this._placeMainWindow(win);
+      this._placePicker(win);
       this._activateOverlay(win);
     };
     const id = win.connect("notify::title", check);
-    const sizeId = win.connect("size-changed", () => this._placeMainWindow(win));
+    const sizeId = win.connect("size-changed", () => {
+      this._placeMainWindow(win);
+      this._placePicker(win);
+    });
     const unmanagedId = win.connect("unmanaged", () => {
       this._titleHandlers.delete(win);
+      if (this._picker === win) this._picker = null;
     });
     this._titleHandlers.set(win, [id, sizeId, unmanagedId]);
     check();
@@ -197,6 +232,58 @@ export default class KnivchitExtension extends Extension {
       return GLib.SOURCE_REMOVE;
     });
     this._idleIds.add(id);
+  }
+
+  // Atajo del panel: anota dónde están el puntero y el cursor de texto AHORA (después la
+  // ventana nueva se queda con el foco) y pide a la app que lo muestre.
+  _openPicker(tab) {
+    const now = GLib.get_monotonic_time();
+    if (Main.sessionMode.isLocked || now - this._lastPickerOpen < PICKER_COOLDOWN_MS * 1000) return;
+    this._lastPickerOpen = now;
+    this._pickerContext = this._capturePickerContext();
+    this._callApp("ShowPicker", [tab]);
+  }
+
+  _capturePickerContext() {
+    const [x, y] = global.get_pointer();
+    const textFocus = Main.inputMethod.currentFocus !== null;
+    return { pointer: { x, y }, caret: textFocus ? this._caret : null, textFocus, at: GLib.get_monotonic_time() };
+  }
+
+  // Solo el panel de la propia app (título y PID). Una segunda ventana del panel se cierra:
+  // nunca hay dos. Se coloca una vez, cuando ya tiene tamaño, encima y con el foco.
+  _placePicker(win) {
+    if (!isPickerWindowTitle(win.get_title()) || !isOwnedByApp(win.get_pid(), this._appPid)) return;
+    if (Main.sessionMode.isLocked || (this._picker && this._picker !== win)) {
+      win.delete(global.get_current_time());
+      return;
+    }
+    this._picker = win;
+    const size = win.get_frame_rect();
+    if (this._placed.has(win) || size.width <= 0 || size.height <= 0) return;
+    this._placed.add(win);
+    const fresh = this._pickerContext && GLib.get_monotonic_time() - this._pickerContext.at < PICKER_CONTEXT_MS * 1000;
+    const { pointer, caret, textFocus } = fresh ? this._pickerContext : this._capturePickerContext();
+    const monitor = global.display.get_current_monitor();
+    const position = placePicker({
+      workArea: Main.layoutManager.getWorkAreaForMonitor(monitor),
+      size: { width: size.width, height: size.height },
+      caret,
+      pointer,
+      textFocus,
+    });
+    const id = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+      this._idleIds.delete(id);
+      win.move_frame(true, position.x, position.y);
+      win.make_above();
+      Main.activateWindow(win);
+      return GLib.SOURCE_REMOVE;
+    });
+    this._idleIds.add(id);
+  }
+
+  _closePicker() {
+    this._picker?.delete(global.get_current_time());
   }
 
   _moveMainWindow(win) {
@@ -373,13 +460,13 @@ export default class KnivchitExtension extends Extension {
   // callback vacío tragaba cualquier error en silencio y el usuario nunca se
   // enteraba de que el atajo no hizo nada. Decisión en `decideCallAppOutcome`
   // (lib/callAppRetry.js), pura y testeada; acá solo el cableado con Gio/Main.
-  _callApp(method, attempt = 1) {
+  _callApp(method, args = [], attempt = 1) {
     Gio.DBus.session.call(
       "org.knivchit.App",
       "/org/knivchit/App",
       "org.knivchit.App",
       method,
-      null,
+      args.length ? new GLib.Variant(`(${"s".repeat(args.length)})`, args) : null,
       null,
       Gio.DBusCallFlags.NONE,
       -1,
@@ -400,7 +487,7 @@ export default class KnivchitExtension extends Extension {
           // esta vaya a quitarse sola al devolver SOURCE_REMOVE.
           const id = GLib.timeout_add(GLib.PRIORITY_DEFAULT, outcome.delayMs, () => {
             this._retryIds.delete(id);
-            this._callApp(method, attempt + 1);
+            this._callApp(method, args, attempt + 1);
             return GLib.SOURCE_REMOVE;
           });
           this._retryIds.add(id);
@@ -422,6 +509,13 @@ export default class KnivchitExtension extends Extension {
     for (const id of this._idleIds ?? []) GLib.Source.remove(id);
     this._idleIds = null;
     Main.wm.removeKeybinding(CAPTURE_KEYBINDING_NAME);
+    Main.wm.removeKeybinding(EMOJI_KEYBINDING_NAME);
+    if (this._caretId) Main.inputMethod.disconnect(this._caretId);
+    this._caretId = null;
+    if (this._sessionUpdatedId) Main.sessionMode.disconnect(this._sessionUpdatedId);
+    this._sessionUpdatedId = null;
+    this._picker = null;
+    this._pickerContext = null;
     if (this._windowCreatedId) global.display.disconnect(this._windowCreatedId);
     this._windowCreatedId = null;
     if (this._attentionId) global.display.disconnect(this._attentionId);
