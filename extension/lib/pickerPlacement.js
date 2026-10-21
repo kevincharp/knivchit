@@ -18,8 +18,8 @@ const isUsableCaret = (caret, workArea) =>
  * Sin foco de texto queda donde la ventana principal. Nunca sale por arriba ni
  * por la izquierda del área, aunque el panel no quepa.
  *
- * workArea, size, caret: { x, y, width, height } enteros (size sin x, y);
- * pointer: { x, y }; caret puede ser null.
+ * workArea, size, caret: { x, y, width, height } (size sin x, y); pointer: { x, y };
+ * caret puede ser null. Devuelve { x, y } enteros.
  */
 export function placePicker({ workArea, size, caret, pointer, textFocus }) {
   let x;
@@ -38,8 +38,9 @@ export function placePicker({ workArea, size, caret, pointer, textFocus }) {
   }
   y = Math.min(y, workArea.y + workArea.height - size.height);
   x = Math.min(x, workArea.x + workArea.width - size.width);
+  // El cursor de texto llega con decimales con escala fraccionaria.
   return {
-    x: Math.max(x, workArea.x),
-    y: Math.max(y, workArea.y),
+    x: Math.round(Math.max(x, workArea.x)),
+    y: Math.round(Math.max(y, workArea.y)),
   };
 }

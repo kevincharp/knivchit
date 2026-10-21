@@ -29,5 +29,7 @@ check("sin foco de texto: la posición de la ventana principal", { textFocus: fa
 check("área menor que el panel: no sale por arriba ni por la izquierda", { workArea: rect(0, 32, 200, 300), caret: rect(100, 100, 2, 18) }, { x: 0, y: 32 });
 check("área menor y sin foco de texto", { workArea: rect(0, 32, 200, 300), textFocus: false }, { x: 0, y: 32 });
 check("área con origen desplazado", { workArea: rect(1920, 32, 1920, 1048), caret: rect(2000, 300, 2, 18) }, { x: 2010, y: 300 });
+check("cursor con decimales (escala fraccionaria): coordenadas enteras", { caret: rect(217.4, 339.95, 0, 158.86) }, { x: 225, y: 340 });
+check("puntero con decimales", { pointer: { x: 700.5, y: 400.4 } }, { x: 709, y: 408 });
 
 print("PASS: placePicker coloca el panel junto al cursor, al puntero o como la ventana principal");
