@@ -2,20 +2,14 @@ import Gio from "gi://Gio";
 import GLib from "gi://GLib";
 import { APP_BUS_NAME, authorizeCaller } from "./callerAuth.js";
 
-// Lógica pura del servicio D-Bus de la extensión (historial de portapapeles,
-// aún sin función, y atajos de teclado). NUNCA importa gi://Shell, gi://Meta
+// Lógica pura del servicio D-Bus de la extensión (atajos de teclado e icono
+// de la barra). NUNCA importa gi://Shell, gi://Meta
 // ni Main — eso es lo que permite testear este archivo con `gjs -m` a secas,
 // fuera del proceso real de GNOME Shell. El contrato D-Bus está resumido en extension/README.md.
 
 const IFACE_XML = `
 <node>
   <interface name="org.knivchit.ClipboardService">
-    <method name="GetHistory">
-      <arg type="aa{sv}" direction="out" name="entries"/>
-    </method>
-    <signal name="HistoryChanged">
-      <arg type="a{sv}" name="entry"/>
-    </signal>
     <method name="GetShortcuts">
       <arg type="a{ss}" direction="out" name="shortcuts"/>
     </method>
@@ -52,7 +46,6 @@ export class ClipboardService {
   constructor({ shortcuts = null, recorder = null, panelIcon = null, authorize }) {
     if (typeof authorize !== "function") throw new Error("ClipboardService necesita authorize()");
     this._authorize = authorize;
-    this._history = [];
     this._shortcuts = shortcuts;
     this._recorder = recorder;
     this._panelIcon = panelIcon;
@@ -65,13 +58,6 @@ export class ClipboardService {
 
   unexport() {
     this._dbusImpl.unexport();
-  }
-
-  GetHistory() {
-    return this._history.map((entry) => ({
-      content_type: new GLib.Variant("s", entry.content_type),
-      content: new GLib.Variant("s", entry.content),
-    }));
   }
 
   // Los cuatro métodos de atajos solo los atiende al dueño de org.knivchit.App
@@ -150,20 +136,6 @@ export class ClipboardService {
         invocation.return_value(new GLib.Variant("(ss)", [accel, status]));
       });
     });
-  }
-
-  // Llamado por extension.js cuando St.Clipboard reporta un cambio real.
-  notifyChange(entry) {
-    this._history.unshift(entry);
-    this._dbusImpl.emit_signal(
-      "HistoryChanged",
-      new GLib.Variant("(a{sv})", [
-        {
-          content_type: new GLib.Variant("s", entry.content_type),
-          content: new GLib.Variant("s", entry.content),
-        },
-      ]),
-    );
   }
 }
 

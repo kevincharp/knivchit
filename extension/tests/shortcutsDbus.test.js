@@ -278,7 +278,4 @@ const press = (keyName, mods = []) => recorder.key({ keyName, mods, isModifier: 
   lonely.unexport();
 }
 
-// Lo anterior del servicio no se rompe
-eq(call("GetHistory", null, "(aa{sv})").deepUnpack()[0], [], "GetHistory sigue vacío");
-
 print("PASS: ClipboardService expone GetShortcuts/SetShortcut/CheckConflicts/RecordShortcut con las firmas acordadas por el bus y libera el grab si el cliente desaparece");

@@ -233,13 +233,15 @@ fn every_app_method_the_extension_calls_is_implemented_by_the_app() {
     assert!(missing.is_empty(), "la extensión llama a métodos que la app no implementa: {missing:?}");
 }
 
+// R20: el broadcast del historial no existe en ningún lado del contrato.
 #[test]
-fn the_history_changed_signal_has_the_same_payload_on_both_sides() {
+fn the_history_broadcast_is_gone_from_both_sides() {
     let js = repo_file("extension/lib/clipboardService.js");
-    assert!(js.contains("<signal name=\"HistoryChanged\">\n      <arg type=\"a{sv}\" name=\"entry\"/>"));
     let rs = repo_file("app/src-tauri/src/dbus/mod.rs");
-    let line = rs.lines().find(|l| l.contains("fn history_changed(")).expect("sin history_changed");
-    assert!(line.contains("HashMap<String, OwnedValue>"), "{line}");
+    for name in ["GetHistory", "HistoryChanged", "history_changed"] {
+        assert!(!js.contains(name), "clipboardService.js vuelve a mencionar {name}");
+        assert!(!rs.contains(name), "dbus/mod.rs vuelve a mencionar {name}");
+    }
 }
 
 #[test]

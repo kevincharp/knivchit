@@ -1,15 +1,9 @@
-use std::collections::HashMap;
 use std::fs;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use futures_util::StreamExt;
-use sqlx::SqlitePool;
 use zbus::message::Header;
-use zbus::zvariant::OwnedValue;
-use zbus::{fdo, interface, proxy, Connection};
-
-use crate::db;
+use zbus::{fdo, interface, Connection};
 
 /// Servicio `org.knivchit.App` en `/org/knivchit/App`.
 ///
@@ -224,111 +218,16 @@ impl AppService {
     }
 }
 
-/// Cliente del servicio `org.knivchit.ClipboardService` que expone la
-/// extensión GNOME. La app es cliente acá, aunque también sea servidor de
-/// `org.knivchit.App` — son dos roles distintos sobre el mismo bus.
-#[proxy(
-    interface = "org.knivchit.ClipboardService",
-    default_service = "org.knivchit.ClipboardService",
-    default_path = "/org/knivchit/ClipboardService"
-)]
-trait ClipboardService {
-    #[zbus(signal)]
-    fn history_changed(&self, entry: HashMap<String, OwnedValue>) -> zbus::Result<()>;
-}
-
-/// Conecta al bus de sesión REAL, registra `org.knivchit.App` (servidor) y
-/// se queda suscrito a `HistoryChanged` (cliente) — este es el punto de
-/// entrada que faltaba conectar desde `lib.rs::run()`; hasta ahora ambos
-/// lados del contrato D-Bus solo se ejercitaban en tests de integración
-/// contra un bus privado, nunca en la app real. Corre indefinidamente.
-pub async fn serve_app_and_subscribe(
-    service: AppService,
-    pool: SqlitePool,
-    cap_count: i64,
-) -> zbus::Result<()> {
-    let connection = zbus::connection::Builder::session()?
+/// Conecta al bus de sesión REAL y registra `org.knivchit.App` (servidor).
+/// Es el punto de entrada que llama `lib.rs::run()`; corre indefinidamente
+/// porque soltar la conexión liberaría el nombre.
+pub async fn serve_app(service: AppService) -> zbus::Result<()> {
+    let _connection = zbus::connection::Builder::session()?
         .name("org.knivchit.App")?
         .serve_at("/org/knivchit/App", service)?
         .build()
         .await?;
-
-    subscribe_to_clipboard_changes(&connection, pool, cap_count).await
-}
-
-/// Tipos de contenido que acepta el historial (igual que el `CHECK` de SQL).
-const CONTENT_TYPES: [&str; 3] = ["text", "image", "link"];
-/// Tope de `content` para texto y enlaces.
-pub const MAX_TEXT_BYTES: usize = 1024 * 1024;
-/// Tope de `content` para imágenes.
-pub const MAX_IMAGE_BYTES: usize = 16 * 1024 * 1024;
-/// Tope de `source_app`; uno más largo se trata como ausente (NULL).
-pub const MAX_SOURCE_APP_BYTES: usize = 256;
-
-/// Decide si una entrada de `HistoryChanged` se guarda. `None` = descartar;
-/// `Some(source_app)` = guardar con el `source_app` ya saneado. Nunca registra
-/// el contenido.
-pub fn accept_entry(
-    content_type: &str,
-    content: &str,
-    source_app: Option<String>,
-) -> Option<Option<String>> {
-    if !CONTENT_TYPES.contains(&content_type) {
-        return None;
-    }
-    let max = if content_type == "image" { MAX_IMAGE_BYTES } else { MAX_TEXT_BYTES };
-    if content.is_empty() || content.len() > max {
-        return None;
-    }
-    Some(source_app.filter(|s| !s.is_empty() && s.len() <= MAX_SOURCE_APP_BYTES))
-}
-
-/// RESERVADO: la extensión aún no emite `HistoryChanged` (su TODO de
-/// `St.Clipboard` sigue abierto), así que hoy esta suscripción no recibe nada.
-///
-/// Se suscribe a `HistoryChanged` y persiste cada entrada.
-/// Corre indefinidamente; el caller la spawnea como una tarea de
-/// fondo separada.
-pub async fn subscribe_to_clipboard_changes(
-    connection: &Connection,
-    pool: SqlitePool,
-    cap_count: i64,
-) -> zbus::Result<()> {
-    let proxy = ClipboardServiceProxy::new(connection).await?;
-    let mut stream = proxy.receive_history_changed().await?;
-
-    while let Some(signal) = stream.next().await {
-        let args = match signal.args() {
-            Ok(args) => args,
-            Err(_) => continue,
-        };
-        let entry = args.entry;
-
-        let content_type = entry
-            .get("content_type")
-            .and_then(|v| String::try_from(v.clone()).ok());
-        let content = entry
-            .get("content")
-            .and_then(|v| String::try_from(v.clone()).ok());
-        let source_app = entry
-            .get("source_app")
-            .and_then(|v| String::try_from(v.clone()).ok());
-
-        // HistoryChanged puede llegar sin source_app — se trata como NULL,
-        // nunca como error.
-        if let (Some(content_type), Some(content)) = (content_type, content) {
-            // Cualquier proceso de la sesión puede reclamar el nombre del bus
-            // si la extensión no está activa: se descarta lo que no cumple.
-            let Some(source_app) = accept_entry(&content_type, &content, source_app) else {
-                continue;
-            };
-            let _ = db::insert_clipboard_entry(&pool, &content_type, &content, source_app.as_deref())
-                .await;
-            let _ = db::evict_clipboard_history(&pool, cap_count).await;
-        }
-    }
-
-    Ok(())
+    std::future::pending().await
 }
 
 #[cfg(test)]
@@ -427,29 +326,5 @@ mod tests {
             exe_name_of(Path::new("/tmp/.mount_KnivchXY/usr/bin/knivchit (deleted)")).as_deref(),
             Some("knivchit")
         );
-    }
-
-    #[test]
-    fn accepts_known_types_within_limits() {
-        for t in ["text", "link", "image"] {
-            assert_eq!(accept_entry(t, "x", None), Some(None), "{t}");
-        }
-        assert_eq!(accept_entry("text", "x", Some("firefox".into())), Some(Some("firefox".into())));
-    }
-
-    #[test]
-    fn rejects_unknown_type_empty_and_oversized_content() {
-        assert!(accept_entry("video", "x", None).is_none());
-        assert!(accept_entry("text", "", None).is_none());
-        assert!(accept_entry("text", &"a".repeat(MAX_TEXT_BYTES + 1), None).is_none());
-        assert!(accept_entry("link", &"a".repeat(MAX_TEXT_BYTES + 1), None).is_none());
-        assert!(accept_entry("image", &"a".repeat(MAX_TEXT_BYTES + 1), None).is_some());
-        assert!(accept_entry("image", &"a".repeat(MAX_IMAGE_BYTES + 1), None).is_none());
-    }
-
-    #[test]
-    fn oversized_or_empty_source_app_becomes_null_not_an_error() {
-        assert_eq!(accept_entry("text", "x", Some("a".repeat(MAX_SOURCE_APP_BYTES + 1))), Some(None));
-        assert_eq!(accept_entry("text", "x", Some(String::new())), Some(None));
     }
 }

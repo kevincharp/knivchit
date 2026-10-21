@@ -34,8 +34,7 @@ interfaz propia ni lógica de negocio; eso es trabajo de `../app/`. Visión de c
 
 ## Qué NO hace
 
-- No accede al portapapeles ni lo escucha (el historial no va en la v0.1; el método
-  `GetHistory` y la señal `HistoryChanged` son restos de ese diseño y no hacen nada).
+- No accede al portapapeles ni lo escucha (el historial no va en la v0.1).
 - No usa la red, ni lanza procesos, ni guarda ni registra las teclas que pulsas.
 
 ## Contrato D-Bus (resumen)
@@ -101,8 +100,7 @@ enviarla a extensions.gnome.org (la guía de revisión es la de gjs.guide) falta
 2. Un `uuid` con un dominio que el autor controle (el actual es provisional).
 3. Una licencia «or later» declarada (el `LICENSE` es la GPL-3.0) y cabeceras SPDX.
 4. Poder explicar el código línea a línea (la guía rechaza código sobrante o generado sin
-   revisar; el grab modal es lo que más mirará un revisor) y quitar el historial sin uso
-   (`GetHistory`, `HistoryChanged`).
+   revisar; el grab modal es lo que más mirará un revisor).
 5. Que la plataforma acepte una extensión que depende de una app externa, y una descripción
    en inglés.
 6. Probar cada versión nueva del Shell antes de ampliar `shell-version` (la 50 y la 51 ya se probaron).

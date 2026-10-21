@@ -27,12 +27,26 @@ connection.call_sync(
   null,
 );
 
-const history = service.GetHistory();
-if (!Array.isArray(history)) {
-  throw new Error("GetHistory no devolvió un array");
-}
-if (history.length !== 0) {
-  throw new Error("el historial debería arrancar vacío");
+// R20: sin historial en la extensión: ni método, ni señal, ni forma de emitirla.
+if (typeof service.GetHistory === "function" || typeof service.notifyChange === "function") {
+  throw new Error("el servicio no debe exponer GetHistory ni notifyChange");
 }
 
-print("PASS: ClipboardService se registra en el bus y GetHistory devuelve un array");
+const [xml] = connection
+  .call_sync(
+    "org.knivchit.ClipboardService",
+    "/org/knivchit/ClipboardService",
+    "org.freedesktop.DBus.Introspectable",
+    "Introspect",
+    null,
+    new GLib.VariantType("(s)"),
+    Gio.DBusCallFlags.NONE,
+    -1,
+    null,
+  )
+  .deepUnpack();
+for (const name of ["GetHistory", "HistoryChanged"]) {
+  if (xml.includes(name)) throw new Error(`la introspección no debe contener ${name}`);
+}
+
+print("PASS: ClipboardService se registra en el bus sin GetHistory ni HistoryChanged");

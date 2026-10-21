@@ -226,10 +226,8 @@ pub fn run() {
             }
 
             // Conecta al bus de sesión real: servidor de org.knivchit.App
-            // (TogglePopup, StartCapture — los llama la extensión GNOME
-            // vía atajo global) y cliente suscrito a HistoryChanged. Antes
-            // de esto, ninguno de los dos lados del contrato D-Bus corría
-            // fuera de los tests de integración.
+            // (StartCapture, ShowPicker — los llama la extensión GNOME vía
+            // atajo global).
             let app_handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
                 let on_start_capture: std::sync::Arc<dyn Fn() + Send + Sync> = {
@@ -274,11 +272,7 @@ pub fn run() {
                     on_show_picker,
                     trust: dbus::CallerTrust::enforced_for_this_process(),
                 };
-                let cap_count = db::get_settings(&pool)
-                    .await
-                    .map(|s| s.clipboard_cap_count)
-                    .unwrap_or(200);
-                if let Err(e) = dbus::serve_app_and_subscribe(service, pool, cap_count).await {
+                if let Err(e) = dbus::serve_app(service).await {
                     eprintln!("knivchit: no se pudo inicializar D-Bus: {e}");
                 }
             });
