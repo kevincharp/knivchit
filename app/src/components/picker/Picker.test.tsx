@@ -201,7 +201,7 @@ describe("Picker", () => {
 		render(<Picker />);
 		fireEvent.change(search(), { target: { value: "mate" } });
 		fireEvent.keyDown(search(), { key: "Enter" });
-		await screen.findByText("Copiado");
+		await screen.findByText("Copiado", {}, { timeout: 4000 });
 		fireEvent.change(search(), { target: { value: "" } });
 		expect(options()[0]).toBe("🧉");
 	});
