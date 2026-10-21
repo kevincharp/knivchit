@@ -27,6 +27,13 @@ export function isCaptureOverlayTitle(title) {
   return title === CAPTURE_OVERLAY_TITLE;
 }
 
+// El panel flotante lleva este título exacto (lo fija la app al crearlo).
+const PICKER_TITLE = "knivchit-picker";
+
+export function isPickerWindowTitle(title) {
+  return title === PICKER_TITLE;
+}
+
 // ¿La ventana es de la propia aplicación? El título lo puede poner cualquier programa, así que
 // además del título se exige que el proceso de la ventana sea el dueño de org.knivchit.App.
 // `appPid` es null mientras la app no está en el bus.

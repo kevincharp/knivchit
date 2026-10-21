@@ -1,4 +1,4 @@
-import { isCaptureOverlayTitle, isMainWindowTitle, isOwnedByApp, isPinWindowTitle } from "../lib/windowMatch.js";
+import { isCaptureOverlayTitle, isMainWindowTitle, isOwnedByApp, isPickerWindowTitle, isPinWindowTitle } from "../lib/windowMatch.js";
 
 // Corre con `gjs -m extension/tests/windowMatch.test.js` (no necesita bus).
 
@@ -64,6 +64,23 @@ for (const [title, expected] of overlayCases) {
     imports.system.exit(1);
   }
 }
+const pickerCases = [
+  ["knivchit-picker", true],
+  ["knivchit-picker-2", false],
+  ["Knivchit", false],
+  ["knivchit-pin", false],
+  ["", false],
+  [null, false],
+  [undefined, false],
+  [7, false],
+];
+for (const [title, expected] of pickerCases) {
+  const got = isPickerWindowTitle(title);
+  if (got !== expected) {
+    printerr(`FAIL: isPickerWindowTitle(${JSON.stringify(title)}) = ${got}, esperaba ${expected}`);
+    imports.system.exit(1);
+  }
+}
 const ownedCases = [
   [4321, 4321, true],
   [4321, 4322, false],
@@ -82,6 +99,7 @@ for (const [winPid, appPid, expected] of ownedCases) {
   }
 }
 print("PASS: isOwnedByApp exige el PID del dueño de org.knivchit.App");
+print("PASS: isPickerWindowTitle reconoce solo el título exacto del panel");
 print("PASS: isCaptureOverlayTitle reconoce solo el título exacto del overlay");
 print("PASS: isPinWindowTitle reconoce solo títulos que empiezan por knivchit-pin");
 print("PASS: isMainWindowTitle reconoce solo el título exacto Knivchit");
