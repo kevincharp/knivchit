@@ -14,6 +14,7 @@ import {
 export { OUTDATED_MESSAGE, SHORTCUTS_UNAVAILABLE_MESSAGE };
 
 export const CAPTURE_ACTION = "capture";
+export const EMOJI_ACTION = "emoji";
 
 export type ShortcutsStatus = "loading" | "ready" | "unavailable" | "outdated";
 
@@ -84,6 +85,7 @@ export function useShortcuts() {
 		extensionActive,
 		shortcuts,
 		capture: shortcuts[CAPTURE_ACTION] || null,
+		emoji: shortcuts[EMOJI_ACTION] || null,
 		error,
 		assign,
 		conflicts,

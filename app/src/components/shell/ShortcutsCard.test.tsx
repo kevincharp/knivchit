@@ -5,6 +5,7 @@ import {
 	render,
 	screen,
 	waitFor,
+	within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -13,11 +14,15 @@ const m = vi.hoisted(() => ({
 	setShortcut: vi.fn(),
 	checkShortcutConflicts: vi.fn(),
 	recordShortcut: vi.fn(),
+	openPicker: vi.fn(),
 }));
 vi.mock("../../lib/tauri", () => m);
 
 import { APP_NAME } from "../../lib/appName";
 import { ShortcutsCard } from "./ShortcutsCard";
+
+/** La fila «Capturar»: con dos filas, los botones se buscan dentro de la suya. */
+const capturar = () => within(screen.getByRole("group", { name: "Capturar" }));
 
 function state(active: boolean, capture?: string) {
 	return {
@@ -47,10 +52,10 @@ describe("ShortcutsCard — estados", () => {
 			screen.getByText(/Cierra sesión y vuelve a entrar/),
 		).toBeInTheDocument();
 		expect(
-			screen.queryByRole("button", { name: "Asignar…" }),
+			capturar().queryByRole("button", { name: "Asignar…" }),
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole("button", { name: "Quitar" }),
+			capturar().queryByRole("button", { name: "Quitar" }),
 		).not.toBeInTheDocument();
 	});
 
@@ -61,14 +66,16 @@ describe("ShortcutsCard — estados", () => {
 			"Reinicia la sesión para cargar la extensión actualizada",
 		);
 		expect(
-			screen.queryByRole("button", { name: "Asignar…" }),
+			capturar().queryByRole("button", { name: "Asignar…" }),
 		).not.toBeInTheDocument();
 	});
 
 	it("extension_outdated al asignar muestra el mismo aviso en vez del genérico", async () => {
 		m.setShortcut.mockRejectedValue("extension_outdated");
 		render(<ShortcutsCard />);
-		fireEvent.click(await screen.findByRole("button", { name: "Asignar…" }));
+		fireEvent.click(
+			await capturar().findByRole("button", { name: "Asignar…" }),
+		);
 		await act(async () => {});
 		expect(
 			await screen.findByText(
@@ -87,9 +94,9 @@ describe("ShortcutsCard — estados", () => {
 
 	it("sin atajo asignado: «Sin asignar», Asignar… activo y Quitar desactivado", async () => {
 		render(<ShortcutsCard />);
-		expect(await screen.findByText("Sin asignar")).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Asignar…" })).toBeEnabled();
-		expect(screen.getByRole("button", { name: "Quitar" })).toBeDisabled();
+		expect(await capturar().findByText("Sin asignar")).toBeInTheDocument();
+		expect(capturar().getByRole("button", { name: "Asignar…" })).toBeEnabled();
+		expect(capturar().getByRole("button", { name: "Quitar" })).toBeDisabled();
 	});
 
 	it("con atajo: lo muestra como chips con nombre accesible y Quitar lo borra", async () => {
@@ -98,31 +105,72 @@ describe("ShortcutsCard — estados", () => {
 		expect(
 			await screen.findByRole("img", { name: "Super + Shift + C" }),
 		).toBeInTheDocument();
-		fireEvent.click(screen.getByRole("button", { name: "Quitar" }));
+		fireEvent.click(capturar().getByRole("button", { name: "Quitar" }));
 		await waitFor(() =>
 			expect(m.setShortcut).toHaveBeenCalledWith("capture", null),
 		);
 	});
 
-	it("las acciones futuras salen atenuadas con «Pronto» y sin botones", async () => {
+	it("la acción futura (Portapapeles) sale atenuada con «Pronto» y sin botones", async () => {
 		render(<ShortcutsCard />);
-		await screen.findByText("Sin asignar");
+		await capturar().findByText("Sin asignar");
 		const items = screen.getAllByRole("listitem");
-		expect(items).toHaveLength(2);
-		for (const li of items) {
-			expect(li).toHaveAttribute("aria-disabled", "true");
-			expect(li).toHaveTextContent("Pronto");
-			expect(li.querySelector("button")).toBeNull();
-		}
-		expect(screen.getByText("Panel de emojis")).toBeInTheDocument();
+		expect(items).toHaveLength(1);
+		expect(items[0]).toHaveAttribute("aria-disabled", "true");
+		expect(items[0]).toHaveTextContent("Pronto");
+		expect(items[0].querySelector("button")).toBeNull();
 		expect(screen.getByText("Portapapeles")).toBeInTheDocument();
+	});
+});
+
+describe("ShortcutsCard — panel de emojis", () => {
+	const emojis = () =>
+		within(screen.getByRole("group", { name: "Panel de emojis" }));
+
+	it("ya no muestra «Pronto» y ofrece Asignar y Quitar contra la acción emoji", async () => {
+		m.getShortcuts.mockResolvedValue({
+			extension_active: true,
+			shortcuts: { emoji: "<Control>j" },
+		});
+		render(<ShortcutsCard />);
+		expect(
+			await emojis().findByRole("img", { name: "Ctrl + J" }),
+		).toBeVisible();
+		expect(emojis().queryByText("Pronto")).toBeNull();
+		fireEvent.click(emojis().getByRole("button", { name: "Quitar" }));
+		await waitFor(() =>
+			expect(m.setShortcut).toHaveBeenCalledWith("emoji", null),
+		);
+	});
+
+	it("Asignar… graba y asigna a la acción emoji", async () => {
+		render(<ShortcutsCard />);
+		fireEvent.click(await emojis().findByRole("button", { name: "Asignar…" }));
+		await waitFor(() =>
+			expect(m.setShortcut).toHaveBeenCalledWith("emoji", "<Control><Alt>k"),
+		);
+	});
+
+	it("«Abrir» llama a openPicker(«emoji») aunque no haya extensión", async () => {
+		m.getShortcuts.mockResolvedValue(state(false));
+		render(<ShortcutsCard />);
+		fireEvent.click(await emojis().findByRole("button", { name: "Abrir" }));
+		expect(m.openPicker).toHaveBeenCalledWith("emoji");
+	});
+
+	it("sugiere Super + . como texto y no lo asigna", async () => {
+		render(<ShortcutsCard />);
+		expect(await emojis().findByText("Sugerencia: Super + .")).toBeVisible();
+		expect(m.setShortcut).not.toHaveBeenCalled();
 	});
 });
 
 describe("ShortcutsCard — asignar con la extensión", () => {
 	async function openRecorder() {
 		render(<ShortcutsCard />);
-		fireEvent.click(await screen.findByRole("button", { name: "Asignar…" }));
+		fireEvent.click(
+			await capturar().findByRole("button", { name: "Asignar…" }),
+		);
 		await act(async () => {});
 	}
 
@@ -238,12 +286,12 @@ describe("ShortcutsCard — asignar con la extensión", () => {
 		m.getShortcuts.mockResolvedValue(state(true, "<Control><Alt>j"));
 		m.setShortcut.mockRejectedValue("shortcuts_unavailable");
 		render(<ShortcutsCard />);
-		fireEvent.click(await screen.findByRole("button", { name: "Quitar" }));
+		fireEvent.click(await capturar().findByRole("button", { name: "Quitar" }));
 		expect(await screen.findByRole("alert")).toHaveTextContent(
 			`Reinicia ${APP_NAME} y cierra la sesión`,
 		);
 		expect(
-			screen.getByRole("button", { name: "Asignar…" }),
+			capturar().getByRole("button", { name: "Asignar…" }),
 		).toBeInTheDocument();
 	});
 
@@ -269,7 +317,8 @@ describe("ShortcutsCard — asignar con la extensión", () => {
 			/min-w-\[8rem\]/,
 		);
 		expect(
-			screen.getByRole("button", { name: "Asignar…" }).parentElement?.className,
+			capturar().getByRole("button", { name: "Asignar…" }).parentElement
+				?.className,
 		).toMatch(/shrink-0.*flex-wrap|flex-wrap.*shrink-0/);
 		expect(
 			container.querySelector("kbd")?.closest("span.flex-wrap"),
