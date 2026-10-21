@@ -11,9 +11,10 @@ function isChoice(v: unknown): v is ThemeChoice {
 	return CHOICES.includes(v as ThemeChoice);
 }
 
-/** Solo la ventana principal (sin `?window=`) lleva tema; overlay y pin quedan como están. */
+/** Llevan tema la ventana principal (sin `?window=`) y el panel; overlay y pin quedan como están. */
 export function shouldApplyTheme(search: string): boolean {
-	return !new URLSearchParams(search).has("window");
+	const kind = new URLSearchParams(search).get("window");
+	return kind === null || kind === "picker";
 }
 
 export function readThemeChoice(): ThemeChoice {

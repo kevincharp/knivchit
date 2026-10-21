@@ -163,5 +163,6 @@ describe("tema", () => {
 		expect(t.shouldApplyTheme("")).toBe(true);
 		expect(t.shouldApplyTheme("?window=capture-overlay")).toBe(false);
 		expect(t.shouldApplyTheme("?window=pin&label=pin-1")).toBe(false);
+		expect(t.shouldApplyTheme("?window=picker")).toBe(true);
 	});
 });

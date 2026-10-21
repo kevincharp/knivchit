@@ -5,6 +5,7 @@ import { CaptureOverlay } from "./components/capture/CaptureOverlay";
 import { DiagOverlay } from "./components/capture/diag/DiagOverlay";
 import { readDiagVariant } from "./components/capture/diag/diagVariant";
 import { PinWindow } from "./components/capture/PinWindow";
+import { Picker } from "./components/picker/Picker";
 import { initTheme, shouldApplyTheme } from "./lib/theme";
 
 // Tauri abre la ventana overlay apuntando a este mismo bundle con
@@ -26,6 +27,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 			)
 		) : windowKind === "pin" ? (
 			<PinWindow />
+		) : windowKind === "picker" ? (
+			<Picker />
 		) : (
 			<App />
 		)}

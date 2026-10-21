@@ -283,3 +283,35 @@ export async function onCapturePermissionChanged(
 		callback(e.payload),
 	);
 }
+
+export type PickerTab = "emoji" | "clipboard";
+export type PickOutcome = "copied" | "inserted";
+
+/** Copia (o inserta) el emoji elegido; el backend solo acepta uno de su conjunto y solo si lo pide la ventana del panel. */
+export async function pickEmoji(emoji: string): Promise<PickOutcome> {
+	return invoke<PickOutcome>("pick_emoji", { emoji });
+}
+
+/** Cierra la ventana del panel. */
+export async function closePicker(): Promise<void> {
+	return invoke("close_picker");
+}
+
+/** Avisa al backend que el usuario sigue usando el panel (si no, se cierra por inactividad). */
+export async function pickerActivity(): Promise<void> {
+	return invoke("picker_activity");
+}
+
+/** Suscripción a la orden de mostrar una pestaña del panel. Devuelve la función que la cancela. */
+export async function onPickerShow(
+	callback: (tab: PickerTab) => void,
+): Promise<() => void> {
+	return listen<{ tab: PickerTab }>("picker://show", (e) =>
+		callback(e.payload.tab),
+	);
+}
+
+/** Abre el panel en la pestaña pedida (para quien no tiene atajo asignado). */
+export async function openPicker(tab: PickerTab): Promise<void> {
+	return invoke("open_picker", { tab });
+}

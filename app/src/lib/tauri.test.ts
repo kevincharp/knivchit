@@ -26,6 +26,7 @@ import {
 	checkShortcutConflicts,
 	chooseSaveDir,
 	closeCurrentWindow,
+	closePicker,
 	closePin,
 	copyCapture,
 	getAppVersion,
@@ -40,7 +41,11 @@ import {
 	getShortcuts,
 	minimizeCurrentWindow,
 	onCapturePermissionChanged,
+	onPickerShow,
+	openPicker,
 	openSaveDir,
+	pickEmoji,
+	pickerActivity,
 	pinCapture,
 	quitApp,
 	recordShortcut,
@@ -309,6 +314,36 @@ describe("permiso de captura", () => {
 		expect(invokeMock).toHaveBeenLastCalledWith("request_capture_permission");
 		invokeMock.mockRejectedValue("cancelled");
 		await expect(requestCapturePermission()).rejects.toBe("cancelled");
+	});
+
+	it("los comandos del panel llaman a su invoke con los argumentos del contrato", async () => {
+		invokeMock.mockResolvedValue("copied");
+		await expect(pickEmoji("👨‍👩‍👧‍👦")).resolves.toBe("copied");
+		expect(invokeMock).toHaveBeenCalledWith("pick_emoji", {
+			emoji: "👨‍👩‍👧‍👦",
+		});
+		await closePicker();
+		expect(invokeMock).toHaveBeenCalledWith("close_picker");
+		await pickerActivity();
+		expect(invokeMock).toHaveBeenCalledWith("picker_activity");
+		await openPicker("clipboard");
+		expect(invokeMock).toHaveBeenCalledWith("open_picker", {
+			tab: "clipboard",
+		});
+	});
+
+	it("onPickerShow escucha «picker://show» y entrega la pestaña", async () => {
+		const unlisten = vi.fn();
+		vi.mocked(listen).mockResolvedValue(unlisten);
+		const seen: unknown[] = [];
+		const stop = await onPickerShow((tab) => seen.push(tab));
+		expect(listen).toHaveBeenCalledWith("picker://show", expect.any(Function));
+		const handler = vi.mocked(listen).mock.calls[0][1] as (e: {
+			payload: unknown;
+		}) => void;
+		handler({ payload: { tab: "clipboard" } });
+		expect(seen).toEqual(["clipboard"]);
+		expect(stop).toBe(unlisten);
 	});
 
 	it("onCapturePermissionChanged escucha «capture-permission-changed» y entrega el payload", async () => {
