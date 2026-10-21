@@ -18,8 +18,13 @@ const TABS: { id: PickerTab; label: string }[] = [
 	{ id: "clipboard", label: "Portapapeles" },
 ];
 
+function initialTab(): PickerTab {
+	const tab = new URLSearchParams(window.location.search).get("tab");
+	return tab === "clipboard" ? "clipboard" : "emoji";
+}
+
 export function Picker() {
-	const [tab, setTab] = useState<PickerTab>("emoji");
+	const [tab, setTab] = useState<PickerTab>(initialTab);
 	const [query, setQuery] = useState("");
 	const [recents] = useState(createRecents);
 	const [recentList, setRecentList] = useState<string[]>([]);

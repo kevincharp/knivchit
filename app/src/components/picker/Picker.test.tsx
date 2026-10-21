@@ -34,6 +34,7 @@ beforeEach(() => {
 
 afterEach(() => {
 	cleanup();
+	window.history.replaceState(null, "", "/");
 	vi.clearAllMocks();
 	vi.useRealTimers();
 });
@@ -200,8 +201,18 @@ describe("Picker", () => {
 		render(<Picker />);
 		fireEvent.change(search(), { target: { value: "mate" } });
 		fireEvent.keyDown(search(), { key: "Enter" });
-		await waitFor(() => expect(tauri.pickEmoji).toHaveBeenCalled());
+		await screen.findByText("Copiado");
 		fireEvent.change(search(), { target: { value: "" } });
 		expect(options()[0]).toBe("🧉");
+	});
+
+	it("la pestaña inicial sale de la URL y un valor desconocido cae a emojis", () => {
+		window.history.replaceState(null, "", "/?window=picker&tab=clipboard");
+		const { unmount } = render(<Picker />);
+		expect(screen.queryByRole("searchbox")).toBeNull();
+		unmount();
+		window.history.replaceState(null, "", "/?window=picker&tab=otra");
+		render(<Picker />);
+		expect(search()).toBeInTheDocument();
 	});
 });
