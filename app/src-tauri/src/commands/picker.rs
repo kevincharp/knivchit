@@ -11,6 +11,8 @@ use tauri::{
     WindowEvent,
 };
 
+use super::output::{run_on_main_thread_blocking, session_clipboard};
+
 pub const PICKER_LABEL: &str = "picker";
 pub const PICKER_TITLE: &str = "knivchit-picker";
 const PICKER_SIZE: (f64, f64) = (320.0, 400.0);
@@ -160,7 +162,11 @@ pub fn spawn_idle_watch<R: Runtime>(app: AppHandle<R>) {
 }
 
 fn check_picker<R: Runtime>(window: &WebviewWindow<R>) -> Result<(), String> {
-    if window.label() != PICKER_LABEL {
+    check_picker_label(window.label())
+}
+
+fn check_picker_label(label: &str) -> Result<(), String> {
+    if label != PICKER_LABEL {
         return Err("solo la ventana del panel puede usar este comando".to_string());
     }
     Ok(())
@@ -206,7 +212,6 @@ impl EmojiSet {
 #[serde(rename_all = "lowercase")]
 pub enum PickOutcome {
     Copied,
-    Inserted,
 }
 
 fn pick_emoji_with(
@@ -215,25 +220,12 @@ fn pick_emoji_with(
     emoji: &str,
     copy: impl FnOnce(&str) -> Result<(), String>,
 ) -> Result<PickOutcome, String> {
-    if caller_label != PICKER_LABEL {
-        return Err("solo la ventana del panel puede elegir un emoji".to_string());
-    }
+    check_picker_label(caller_label)?;
     if !set.contains(emoji) {
         return Err("emoji no válido".to_string());
     }
     copy(emoji)?;
     Ok(PickOutcome::Copied)
-}
-
-fn set_clipboard_text(text: &str) -> Result<(), String> {
-    if !gtk::is_initialized_main_thread() {
-        return Err("GTK no está inicializado (¿sin display?)".to_string());
-    }
-    let display = gtk::gdk::Display::default().ok_or_else(|| "no hay display".to_string())?;
-    let clipboard = gtk::Clipboard::default(&display)
-        .ok_or_else(|| "no hay portapapeles disponible".to_string())?;
-    clipboard.set_text(text);
-    Ok(())
 }
 
 #[tauri::command]
@@ -247,12 +239,10 @@ pub async fn pick_emoji<R: Runtime>(
         .ok_or_else(|| "los datos de emojis no están cargados".to_string())?;
     pick_emoji_with(window.label(), &set, &emoji, |text| {
         let text = text.to_string();
-        let (tx, rx) = std::sync::mpsc::channel();
-        app.run_on_main_thread(move || {
-            let _ = tx.send(set_clipboard_text(&text));
+        run_on_main_thread_blocking(&app, move || {
+            session_clipboard()?.set_text(&text);
+            Ok(())
         })
-        .map_err(|e| format!("no se pudo acceder al hilo principal: {e}"))?;
-        rx.recv().map_err(|_| "el hilo principal no respondió".to_string())?
     })
 }
 
@@ -311,7 +301,6 @@ mod tests {
     #[test]
     fn the_outcome_serializes_in_lowercase() {
         assert_eq!(serde_json::to_string(&PickOutcome::Copied).unwrap(), "\"copied\"");
-        assert_eq!(serde_json::to_string(&PickOutcome::Inserted).unwrap(), "\"inserted\"");
     }
 
     #[test]

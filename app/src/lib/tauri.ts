@@ -285,7 +285,7 @@ export async function onCapturePermissionChanged(
 }
 
 export type PickerTab = "emoji" | "clipboard";
-export type PickOutcome = "copied" | "inserted";
+export type PickOutcome = "copied";
 
 /** Copia (o inserta) el emoji elegido; el backend solo acepta uno de su conjunto y solo si lo pide la ventana del panel. */
 export async function pickEmoji(emoji: string): Promise<PickOutcome> {

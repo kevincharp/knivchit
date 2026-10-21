@@ -435,24 +435,38 @@ pub fn copy_capture<R: Runtime>(
     let bytes = raw_body(&request)?;
     let copied = copy_capture_impl(&state.0, bytes, |png| {
         let png = png.to_vec();
-        let (tx, rx) = std::sync::mpsc::channel();
-        app.run_on_main_thread(move || {
-            let _ = tx.send(set_clipboard_image(&png));
-        })
-        .map_err(|e| format!("no se pudo acceder al hilo principal: {e}"))?;
-        rx.recv()
-            .map_err(|_| "el hilo principal no respondió".to_string())?
+        run_on_main_thread_blocking(&app, move || set_clipboard_image(&png))
     });
     copied
+}
+
+/// Ejecuta `job` en el hilo principal de GTK y espera su resultado.
+pub(crate) fn run_on_main_thread_blocking<R: Runtime>(
+    app: &AppHandle<R>,
+    job: impl FnOnce() -> Result<(), String> + Send + 'static,
+) -> Result<(), String> {
+    let (tx, rx) = std::sync::mpsc::channel();
+    app.run_on_main_thread(move || {
+        let _ = tx.send(job());
+    })
+    .map_err(|e| format!("no se pudo acceder al hilo principal: {e}"))?;
+    rx.recv()
+        .map_err(|_| "el hilo principal no respondió".to_string())?
+}
+
+/// Portapapeles de la sesión; solo se llama desde el hilo principal de GTK.
+pub(crate) fn session_clipboard() -> Result<gtk::Clipboard, String> {
+    if !gtk::is_initialized_main_thread() {
+        return Err("GTK no está inicializado (¿sin display?)".to_string());
+    }
+    let display = gtk::gdk::Display::default().ok_or_else(|| "no hay display".to_string())?;
+    gtk::Clipboard::default(&display).ok_or_else(|| "no hay portapapeles disponible".to_string())
 }
 
 fn set_clipboard_image(png: &[u8]) -> Result<(), String> {
     use gtk::gdk_pixbuf::PixbufLoader;
     use gtk::prelude::*;
 
-    if !gtk::is_initialized_main_thread() {
-        return Err("GTK no está inicializado (¿sin display?)".to_string());
-    }
     let loader = PixbufLoader::with_type("png")
         .map_err(|e| format!("no se pudo preparar el decodificador PNG: {e}"))?;
     loader
@@ -464,10 +478,7 @@ fn set_clipboard_image(png: &[u8]) -> Result<(), String> {
     let pixbuf = loader
         .pixbuf()
         .ok_or_else(|| "el PNG no produjo una imagen".to_string())?;
-    let display = gtk::gdk::Display::default().ok_or_else(|| "no hay display".to_string())?;
-    let clipboard = gtk::Clipboard::default(&display)
-        .ok_or_else(|| "no hay portapapeles disponible".to_string())?;
-    clipboard.set_image(&pixbuf);
+    session_clipboard()?.set_image(&pixbuf);
     Ok(())
 }
 
