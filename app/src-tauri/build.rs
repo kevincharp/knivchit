@@ -15,6 +15,7 @@ const APP_COMMANDS: &[&str] = &[
     "pin_capture",
     "get_pin_image",
     "close_pin",
+    "pick_emoji",
     "close_picker",
     "picker_activity",
     "open_picker",

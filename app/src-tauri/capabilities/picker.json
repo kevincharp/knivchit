@@ -6,6 +6,7 @@
 	"permissions": [
 		"core:event:allow-listen",
 		"core:event:allow-unlisten",
+		"allow-pick-emoji",
 		"allow-close-picker",
 		"allow-picker-activity"
 	]

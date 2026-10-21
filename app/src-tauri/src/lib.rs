@@ -289,6 +289,7 @@ pub fn run() {
             commands::pin::pin_capture,
             commands::pin::get_pin_image,
             commands::pin::close_pin,
+            commands::picker::pick_emoji,
             commands::picker::close_picker,
             commands::picker::picker_activity,
             commands::picker::open_picker,

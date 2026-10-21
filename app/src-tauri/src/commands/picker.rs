@@ -2,6 +2,7 @@
 //! la extensión coloca (reconocida por el título). Alterna con el atajo, cambia
 //! de pestaña si se pide la otra y se cierra sola tras un rato sin actividad.
 
+use std::collections::HashSet;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
@@ -180,6 +181,80 @@ pub fn picker_activity<R: Runtime>(
     Ok(())
 }
 
+/// Emojis que el backend acepta copiar (R27): lo que llega del webview solo
+/// vale si coincide exactamente con uno del conjunto embebido.
+pub struct EmojiSet(HashSet<String>);
+
+impl EmojiSet {
+    pub fn from_json(json: &str) -> Result<Self, String> {
+        #[derive(serde::Deserialize)]
+        struct Entry {
+            char: String,
+        }
+        let entries: Vec<Entry> =
+            serde_json::from_str(json).map_err(|e| format!("datos de emojis no válidos: {e}"))?;
+        Ok(Self(entries.into_iter().map(|e| e.char).collect()))
+    }
+
+    pub fn contains(&self, text: &str) -> bool {
+        self.0.contains(text)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PickOutcome {
+    Copied,
+    Inserted,
+}
+
+fn pick_emoji_with(
+    caller_label: &str,
+    set: &EmojiSet,
+    emoji: &str,
+    copy: impl FnOnce(&str) -> Result<(), String>,
+) -> Result<PickOutcome, String> {
+    if caller_label != PICKER_LABEL {
+        return Err("solo la ventana del panel puede elegir un emoji".to_string());
+    }
+    if !set.contains(emoji) {
+        return Err("emoji no válido".to_string());
+    }
+    copy(emoji)?;
+    Ok(PickOutcome::Copied)
+}
+
+fn set_clipboard_text(text: &str) -> Result<(), String> {
+    if !gtk::is_initialized_main_thread() {
+        return Err("GTK no está inicializado (¿sin display?)".to_string());
+    }
+    let display = gtk::gdk::Display::default().ok_or_else(|| "no hay display".to_string())?;
+    let clipboard = gtk::Clipboard::default(&display)
+        .ok_or_else(|| "no hay portapapeles disponible".to_string())?;
+    clipboard.set_text(text);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn pick_emoji<R: Runtime>(
+    window: WebviewWindow<R>,
+    app: AppHandle<R>,
+    emoji: String,
+) -> Result<PickOutcome, String> {
+    let set = app
+        .try_state::<EmojiSet>()
+        .ok_or_else(|| "los datos de emojis no están cargados".to_string())?;
+    pick_emoji_with(window.label(), &set, &emoji, |text| {
+        let text = text.to_string();
+        let (tx, rx) = std::sync::mpsc::channel();
+        app.run_on_main_thread(move || {
+            let _ = tx.send(set_clipboard_text(&text));
+        })
+        .map_err(|e| format!("no se pudo acceder al hilo principal: {e}"))?;
+        rx.recv().map_err(|_| "el hilo principal no respondió".to_string())?
+    })
+}
+
 #[tauri::command]
 pub fn open_picker<R: Runtime>(app: AppHandle<R>, tab: String) -> Result<(), String> {
     if !TABS.contains(&tab.as_str()) {
@@ -199,6 +274,43 @@ mod tests {
         assert_eq!(decide_toggle(true, Some("emoji"), "clipboard"), PickerAction::SwitchTab);
         assert_eq!(decide_toggle(true, Some("emoji"), "emoji"), PickerAction::Close);
         assert_eq!(decide_toggle(false, Some("emoji"), "emoji"), PickerAction::SwitchTab);
+    }
+
+    const EMOJIS: &str = r#"[{"char":"😀"},{"char":"👨‍👩‍👧‍👦"},{"char":"🇦🇷"},{"char":"❤️"},{"char":"🧉"}]"#;
+
+    #[test]
+    fn the_set_accepts_exact_emojis_only() {
+        let set = EmojiSet::from_json(EMOJIS).unwrap();
+        for ok in ["😀", "👨‍👩‍👧‍👦", "🇦🇷", "❤️", "🧉"] {
+            assert!(set.contains(ok), "{ok}");
+        }
+        for bad in ["😀😀", "a", "", "😀\n", "❤", "🍕"] {
+            assert!(!set.contains(bad), "{bad:?}");
+        }
+        assert!(EmojiSet::from_json("no es json").is_err());
+    }
+
+    #[test]
+    fn picking_copies_a_valid_emoji_from_the_picker_only() {
+        let set = EmojiSet::from_json(EMOJIS).unwrap();
+        let mut copied = Vec::new();
+        let outcome = pick_emoji_with(PICKER_LABEL, &set, "🧉", |t| {
+            copied.push(t.to_string());
+            Ok(())
+        });
+        assert_eq!(outcome, Ok(PickOutcome::Copied));
+        assert_eq!(copied, ["🧉"]);
+
+        for (label, emoji) in [("main", "🧉"), (PICKER_LABEL, "🍕")] {
+            let outcome = pick_emoji_with(label, &set, emoji, |_| panic!("no debe copiar"));
+            assert!(outcome.is_err(), "{label} {emoji}");
+        }
+    }
+
+    #[test]
+    fn the_outcome_serializes_in_lowercase() {
+        assert_eq!(serde_json::to_string(&PickOutcome::Copied).unwrap(), "\"copied\"");
+        assert_eq!(serde_json::to_string(&PickOutcome::Inserted).unwrap(), "\"inserted\"");
     }
 
     #[test]

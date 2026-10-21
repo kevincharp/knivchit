@@ -78,7 +78,7 @@ fn the_picker_capability_grants_only_its_own_commands_and_events() {
     granted.sort();
     assert_eq!(
         granted,
-        ["allow-close-picker", "allow-picker-activity", "core:event:allow-listen", "core:event:allow-unlisten"]
+        ["allow-close-picker", "allow-pick-emoji", "allow-picker-activity", "core:event:allow-listen", "core:event:allow-unlisten"]
     );
     let default = capability_permissions("default");
     for perm in granted.iter().filter(|p| p.starts_with("allow-")) {
