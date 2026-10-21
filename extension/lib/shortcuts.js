@@ -12,7 +12,7 @@
 // sus claves existen (vacías) pero no se ligan ni se pueden asignar todavía.
 export const ACTIONS = {
   capture: { key: "knivchit-start-capture", available: true },
-  emoji: { key: "knivchit-open-emoji", available: false },
+  emoji: { key: "knivchit-open-emoji", available: true },
   clipboard: { key: "knivchit-open-clipboard", available: false },
 };
 
@@ -114,6 +114,11 @@ export function parseAccelerator(input, isKnownKey, { lenient = false, allowRese
 // misma tecla (sin importar mayúsculas).
 const combinationId = (parsed) => `${[...parsed.mods].sort().join("")}|${parsed.key.toLowerCase()}`;
 
+const combinationOfStored = (accel, isKnownKey) => {
+  const parsed = accel ? parseAccelerator(accel, isKnownKey) : null;
+  return parsed?.ok ? combinationId(parsed) : null;
+};
+
 /**
  * Descripciones legibles de los atajos de `bindings` ({ accel, description })
  * que coinciden con el acelerador ya validado `parsed`, sin repetir.
@@ -165,6 +170,11 @@ export class ShortcutManager {
     }
     const parsed = parseAccelerator(accel, this._isKnownKey);
     if (!parsed.ok) return [false, parsed.error];
+    // Con el mismo acelerador en dos acciones Mutter solo dispara una.
+    const taken = Object.entries(ACTIONS).find(
+      ([name, other]) => name !== action && combinationOfStored(this._settings.get_strv(other.key)[0], this._isKnownKey) === combinationId(parsed),
+    );
+    if (taken) return [false, `Ya lo usa la acción «${taken[0]}» de Knivchit.`];
     this._settings.set_strv(entry.key, [parsed.accel]);
     this._onChanged(action, parsed.accel);
     return [true, ""];

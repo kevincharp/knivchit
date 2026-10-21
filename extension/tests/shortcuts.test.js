@@ -170,7 +170,6 @@ const makeManager = () => {
     ["capture", "<Super>xx", "desconocida"],
     ["capture", "<Super>", "tecla"],
     ["nueva", "<Super>c", "desconocida"],
-    ["emoji", "<Super>period", "disponible"], // reservada, aún sin función
     ["clipboard", "<Super>x", "disponible"],
   ]) {
     const [ok, error] = manager.setShortcut(action, accel);
@@ -178,8 +177,22 @@ const makeManager = () => {
     if (!error.toLowerCase().includes(fragment)) fail(`SetShortcut(${action}, ${accel}): «${error}» debería mencionar «${fragment}»`);
   }
   eq(store.get("knivchit-start-capture"), ["<Control><Alt>c"], "los errores no modifican lo guardado");
-  eq(store.get("knivchit-open-emoji"), [], "las acciones reservadas siguen vacías");
+  eq(store.get("knivchit-open-clipboard"), [], "la acción reservada sigue vacía");
   eq(changes.length, 2, "los errores no avisan de cambios");
+
+  // emoji ya está disponible; clipboard sigue reservada
+  eq(manager.setShortcut("emoji", "<Super>period"), [true, ""], "asignar emoji");
+  eq(store.get("knivchit-open-emoji"), ["<Super>period"], "emoji guardado normalizado");
+
+  // el mismo acelerador en dos acciones de Knivchit: gana la primera, la segunda se rechaza
+  {
+    const [ok, error] = manager.setShortcut("capture", "<Super>period");
+    if (ok || !error.includes("emoji")) fail(`duplicado entre acciones debería rechazarse nombrando «emoji»: ${ok} «${error}»`);
+    eq(store.get("knivchit-start-capture"), ["<Control><Alt>c"], "el duplicado no cambia nada");
+    eq(manager.setShortcut("emoji", "<Super>period"), [true, ""], "reasignar a la misma acción no es duplicado");
+    eq(manager.setShortcut("emoji", ""), [true, ""], "quitar emoji");
+    eq(manager.setShortcut("capture", "<Control><Alt>c"), [true, ""], "reasignar capture a lo mismo");
+  }
 
   // vacío = quitar el atajo
   eq(manager.setShortcut("capture", ""), [true, ""], "quitar");
@@ -197,7 +210,7 @@ for (const [name, action] of Object.entries(ACTIONS))
   if (typeof action.key !== "string" || !action.key.startsWith("knivchit-"))
     fail(`la acción ${name} no tiene una clave knivchit-*`);
 eq(Object.keys(ACTIONS), ["capture", "emoji", "clipboard"], "acciones conocidas");
-eq(Object.values(ACTIONS).map((a) => a.available), [true, false, false], "solo capturar tiene función hoy");
+eq(Object.values(ACTIONS).map((a) => a.available), [true, true, false], "capturar y emoji tienen función hoy");
 
 // sanitize(): lo que ya hay en GSettings se somete a las reglas de SetShortcut
 {

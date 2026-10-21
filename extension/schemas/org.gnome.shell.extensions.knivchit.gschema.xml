@@ -8,8 +8,8 @@
     </key>
     <key name="knivchit-open-emoji" type="as">
       <default>[]</default>
-      <summary>Atajo del panel de emojis (reservado)</summary>
-      <description>Reservado para una función futura; vacío por defecto y todavía sin ligar a ninguna acción.</description>
+      <summary>Atajo para abrir el panel de emojis</summary>
+      <description>Vacío por defecto: lo elige el usuario en la Configuración de la app. Al pulsarlo la extensión llama a org.knivchit.App.ShowPicker("emoji").</description>
     </key>
     <key name="knivchit-open-clipboard" type="as">
       <default>[]</default>

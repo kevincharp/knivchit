@@ -47,7 +47,7 @@ cambian a la vez en los dos lados.
 |---|---|---|---|
 | `org.knivchit.App` | `StartCapture` | `()` | Inicia una captura (la llama la extensión al pulsar el atajo). |
 | `org.knivchit.App` | `ShowMain` | `()` | Muestra la ventana principal (la llama el icono de la barra). |
-| `org.knivchit.ClipboardService` | `GetShortcuts` | `() → a{ss}` | Acción → acelerador GTK (`""` si no hay). Acciones: `capture` (disponible), `emoji` y `clipboard` (reservadas). |
+| `org.knivchit.ClipboardService` | `GetShortcuts` | `() → a{ss}` | Acción → acelerador GTK (`""` si no hay). Acciones: `capture` (disponible), `emoji` (disponible) y `clipboard` (reservada). |
 | | `SetShortcut` | `(s accion, s accel) → (b ok, s error)` | Valida y guarda; `accel` vacío quita el atajo. Un error de validación es `(false, motivo)`, no un error D-Bus. Rechaza aceleradores sin modificador y los reservados (Ctrl+tecla, Alt+tecla de menú, Alt+F4, Alt+Tab, Super+L, Ctrl+Alt+Supr). |
 | | `CheckConflicts` | `(s accel) → as` | Atajos del sistema que usan la misma combinación (solo informativo). |
 | | `RecordShortcut` | `() → (s accel, s status)` | Graba UNA combinación (`ok`, `cancelled`, `timeout`, `invalid`, `busy`, `unavailable`); respuesta asíncrona de hasta 12 s; exige la ventana «Knivchit» enfocada y espera 750 ms entre grabaciones. |
