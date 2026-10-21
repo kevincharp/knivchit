@@ -83,13 +83,14 @@ try {
     ["abortar la grabación en disable()", disableBody, /this\._recorder\?\.dispose\(\)/],
     ["quitar el icono de la barra en disable()", disableBody, /this\._panelIcon\?\.stop\(\)/],
     ["retirar el atajo en disable()", disableBody, /Main\.wm\.removeKeybinding\(CAPTURE_KEYBINDING_NAME\)/],
+    ["retirar el atajo de emojis en disable()", disableBody, /Main\.wm\.removeKeybinding\(EMOJI_KEYBINDING_NAME\)/],
   ])
     if (!pattern.test(source)) fail(`extension.js debe ${what}`);
 
   for (const [action, { key }] of Object.entries(ACTIONS))
     if (!schema.has_key(key)) fail(`la acción "${action}" usa la clave "${key}", que no está en el esquema`);
   for (const name of names)
-    if (/clipboard|portapapeles|emoji/i.test(name))
+    if (/clipboard|portapapeles/i.test(name))
       fail(`extension.js liga "${name}", una acción que aún no existe`);
 } finally {
   GLib.spawn_command_line_sync(`rm -rf ${tmp}`);
