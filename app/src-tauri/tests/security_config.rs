@@ -62,3 +62,42 @@ fn the_main_window_is_built_by_show_main_window_with_its_navigation_filter() {
         "show_main_window debe aplicar el filtro de navegación"
     );
 }
+
+fn capability_permissions(name: &str) -> Vec<String> {
+    let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("capabilities")
+        .join(format!("{name}.json"));
+    let json: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+    json["permissions"].as_array().unwrap().iter().map(|p| p.as_str().unwrap().to_string()).collect()
+}
+
+// R27: el panel no hereda nada de `default`; solo sus comandos y los eventos.
+#[test]
+fn the_picker_capability_grants_only_its_own_commands_and_events() {
+    let mut granted = capability_permissions("picker");
+    granted.sort();
+    assert_eq!(
+        granted,
+        ["allow-close-picker", "allow-picker-activity", "core:event:allow-listen", "core:event:allow-unlisten"]
+    );
+    let default = capability_permissions("default");
+    for perm in granted.iter().filter(|p| p.starts_with("allow-")) {
+        assert!(!default.contains(perm), "{perm} también está en default");
+    }
+}
+
+// R13: el panel se construye con el filtro de navegación y este rechaza lo remoto.
+#[test]
+fn the_picker_window_is_built_with_the_navigation_filter() {
+    let source = std::fs::read_to_string(
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src/commands/picker.rs"),
+    )
+    .unwrap();
+    let builder = &source[source.find("WebviewWindowBuilder::new(").unwrap()..];
+    assert!(
+        builder[..builder.find(".build()").unwrap()].contains("on_navigation(crate::navigation::allow_navigation)"),
+        "la ventana del panel debe aplicar el filtro de navegación"
+    );
+    let remote: tauri::Url = "https://example.com/".parse().unwrap();
+    assert!(!knivchit_lib::navigation::allow_navigation(&remote));
+}

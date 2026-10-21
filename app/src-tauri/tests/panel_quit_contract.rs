@@ -60,7 +60,7 @@ fn quit_and_panel_icon_commands_are_granted_to_the_main_window_only() {
 }
 
 #[test]
-fn there_is_no_capability_file_beyond_the_three_known_ones() {
+fn there_is_no_capability_file_beyond_the_four_known_ones() {
     // una capability nueva podría conceder los comandos a otra ventana sin que los tests la vean
     let mut names: Vec<String> = std::fs::read_dir(manifest().join("capabilities"))
         .unwrap()
@@ -69,7 +69,7 @@ fn there_is_no_capability_file_beyond_the_three_known_ones() {
         .filter(|n| n.ends_with(".json"))
         .collect();
     names.sort();
-    assert_eq!(names, ["capture-overlay.json", "default.json", "pin.json"]);
+    assert_eq!(names, ["capture-overlay.json", "default.json", "picker.json", "pin.json"]);
 }
 
 #[test]
@@ -82,6 +82,7 @@ fn only_main_owns_windows_that_are_not_overlay_or_pins() {
         read_capability("pin")["windows"],
         serde_json::json!(["pin-*"])
     );
+    assert_eq!(read_capability("picker")["windows"], serde_json::json!(["picker"]));
 }
 
 // ---- 2. autorización de ShowMain / StartCapture ------------------------------

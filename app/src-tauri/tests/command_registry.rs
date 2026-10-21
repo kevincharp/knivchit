@@ -179,7 +179,7 @@ fn capability(name: &str) -> BTreeSet<String> {
 // permiso de core se concede a mano, por ventana.
 #[test]
 fn no_capability_grants_a_core_default_set_or_wildcard() {
-    for name in ["default", "capture-overlay", "pin"] {
+    for name in ["default", "capture-overlay", "pin", "picker"] {
         for perm in capability(name) {
             assert!(!perm.ends_with(":default"), "{name}: {perm}");
             assert!(!perm.contains('*'), "{name}: {perm}");
@@ -224,5 +224,9 @@ fn each_window_has_exactly_the_core_permissions_it_uses() {
             "core:window:allow-start-dragging",
             "core:window:allow-set-focus",
         ])
+    );
+    assert_eq!(
+        core("picker"),
+        set(&["core:event:allow-listen", "core:event:allow-unlisten"])
     );
 }

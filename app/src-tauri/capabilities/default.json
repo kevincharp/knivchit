@@ -11,6 +11,7 @@
 		"core:event:allow-listen",
 		"core:event:allow-unlisten",
 		"allow-start-capture",
+		"allow-open-picker",
 		"allow-get-capture-permission",
 		"allow-request-capture-permission",
 		"allow-get-integration-status",

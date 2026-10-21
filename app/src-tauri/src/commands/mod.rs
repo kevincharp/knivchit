@@ -3,6 +3,7 @@ pub mod capture_flow;
 pub mod hub;
 pub mod output;
 pub mod panel_icon;
+pub mod picker;
 pub mod pin;
 pub mod quit;
 pub mod settings;

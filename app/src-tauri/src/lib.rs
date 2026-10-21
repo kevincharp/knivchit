@@ -212,6 +212,8 @@ pub fn run() {
             app.manage(pool.clone());
             app.manage(commands::capture_flow::CaptureState::default());
             app.manage(commands::pin::PinState::default());
+            app.manage(commands::picker::PickerState::default());
+            commands::picker::spawn_idle_watch(app.handle().clone());
             app.manage(commands::capture_flow::CaptureActivity::default());
             app.manage(capture_permission::CapturePermission::new(&data_dir));
 
@@ -287,6 +289,9 @@ pub fn run() {
             commands::pin::pin_capture,
             commands::pin::get_pin_image,
             commands::pin::close_pin,
+            commands::picker::close_picker,
+            commands::picker::picker_activity,
+            commands::picker::open_picker,
             commands::get_clipboard_history,
             commands::pin_clipboard_entry,
             commands::delete_clipboard_entry,
