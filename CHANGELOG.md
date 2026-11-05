@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- **GNOME Shell 51:** the extension now declares support for GNOME Shell 51 as well as 50. Checked on 51.1 (Wayland): the global capture shortcut, the top-bar icon and shortcut recording.
+
 ## [0.1.0-alpha.4]
 
 Fixes the About page, which still said the repository was not public yet. To update, run `install.sh` again and log out and back in.

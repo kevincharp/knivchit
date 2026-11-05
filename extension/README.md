@@ -81,8 +81,9 @@ al vencer el tiempo, si la app que llamó desaparece del bus y al deshabilitar l
 
 ## Compatibilidad
 
-Declarada y probada: **GNOME Shell 50**. Otras versiones no se han probado y por eso no se
-declaran en `metadata.json`.
+Declarada y probada: **GNOME Shell 50 y 51** (Wayland). Otras versiones no se han probado y por
+eso no se declaran en `metadata.json`. En la 51 se comprobó en una sesión real el atajo global, el
+icono de la barra superior y la grabación de atajos.
 
 ## Empaquetado e instalación
 
@@ -104,7 +105,7 @@ enviarla a extensions.gnome.org (la guía de revisión es la de gjs.guide) falta
    (`GetHistory`, `HistoryChanged`).
 5. Que la plataforma acepte una extensión que depende de una app externa, y una descripción
    en inglés.
-6. Probar en otras versiones del Shell antes de ampliar `shell-version`.
+6. Probar cada versión nueva del Shell antes de ampliar `shell-version` (la 50 y la 51 ya se probaron).
 
 Ya cumple: nada se crea antes de `enable()`, `disable()` lo destruye todo, sin red, sin
 subprocesos, sin código ofuscado, sin telemetría, esquema con el prefijo exigido y **sin
