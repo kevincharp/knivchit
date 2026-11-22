@@ -1,0 +1,30 @@
+name: Ticket
+description: Uso del mantenedor. Idea, bug o pedido que luego se reescribe y se ordena
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Contalo como te salga. Para un reporte técnico de un bug usá el formulario «Report a bug», que pide versión y entorno. No pegues contenido del portapapeles ni datos personales.
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: Descripción
+      description: Con tus palabras. Si lo pidió un cliente, contalo como lo dijo, sin su nombre ni datos de contacto.
+    validations:
+      required: true
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto adicional
+      description: Pantalla, enlace o captura (sin datos privados).
+  - type: checkboxes
+    id: tipo
+    attributes:
+      label: Tipo
+      description: Opcional. Si no marcás ninguno, lo define el mantenedor.
+      options:
+        - label: bug
+        - label: feature
+        - label: enhancement
+        - label: maintenance
+        - label: client
