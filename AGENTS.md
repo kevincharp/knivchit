@@ -15,7 +15,7 @@ como puente con el compositor. Sin servidor, sin backend, sin cuentas.
 | Lint y formato | `cd app && pnpm exec biome check .` (`--write` para corregir) |
 | Tests del frontend | `cd app && pnpm exec vitest run [archivo]` |
 | Tests de Rust | `cargo test --manifest-path app/src-tauri/Cargo.toml [filtro]` |
-| Tests de la extensión | `dbus-run-session -- gjs -m extension/tests/<archivo>.test.js` |
+| Tests de la extensión | `GIO_USE_VFS=local dbus-run-session -- gjs -m extension/tests/<archivo>.test.js` |
 | Comentarios | `node scripts/check-comments.mjs` (pruebas: `node --test scripts/check-comments.test.mjs`) |
 
 `cargo build --release` solo comprueba que compila: el binario no sirve para

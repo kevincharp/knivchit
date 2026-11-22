@@ -75,8 +75,9 @@ al vencer el tiempo, si la app que llamó desaparece del bus y al deshabilitar l
 - `icons/`: el icono simbólico del panel, cargado por ruta de la extensión.
 - `schemas/`: GSettings (`org.gnome.shell.extensions.knivchit`): las claves de los atajos,
   vacías por defecto, y `show-panel-icon`.
-- `tests/`: `dbus-run-session -- gjs -m extension/tests/<nombre>.test.js` (bus D-Bus privado;
-  no usar el de la sesión real).
+- `tests/`: `GIO_USE_VFS=local dbus-run-session -- gjs -m extension/tests/<nombre>.test.js` (bus D-Bus
+  privado; no usar el de la sesión real). `GIO_USE_VFS=local` evita que GVfs se active en ese bus e
+  imprima «A connection to the bus can't be made» al salir; sin él los tests pasan igual.
 
 ## Compatibilidad
 
