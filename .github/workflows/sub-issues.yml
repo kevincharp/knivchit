@@ -1,0 +1,26 @@
+name: Sub-issues
+
+"on":
+  issues:
+    types: [closed]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-22.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+
+      # Reabre un padre cerrado con hijos abiertos y cierra el padre al cerrarse el último hijo
+      - name: Sincronizar padre e hijos
+        run: bash .github/scripts/sub-issues.sh
