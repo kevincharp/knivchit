@@ -42,6 +42,8 @@ Thumbs.db
 # Estado local de herramientas por-máquina
 .claude
 CLAUDE.local.md
+*.local.md
+*.local.html
 
 # --- Específico de este stack ---
 # Rust / Tauri
