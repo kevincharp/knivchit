@@ -20,6 +20,8 @@ export const END_REASONS = [
   "ceiling",
   "reopened",
   "clock_back",
+  "target_changed",
+  "target_closed",
 ];
 
 export class InsertSession {

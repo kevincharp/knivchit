@@ -86,7 +86,7 @@ jobs:
 
       - name: Tests de la extension
         run: |
-          for t in manifest clipboardService windowMatch callAppRetry windowPlacement shortcuts systemBindings shortcutRecorder shortcutsDbus serviceName panelIcon appProcess insertFilter insertSession; do
+          for t in manifest clipboardService windowMatch callAppRetry windowPlacement shortcuts systemBindings shortcutRecorder shortcutsDbus serviceName panelIcon appProcess insertFilter insertSession insertTarget; do
             dbus-run-session -- gjs -m "extension/tests/$t.test.js"
           done
 
